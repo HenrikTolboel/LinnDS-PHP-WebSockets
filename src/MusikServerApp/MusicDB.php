@@ -425,7 +425,8 @@ class MusicDB extends \SQLite3
 	$Stmt->close();
 
 	//print_r($R);
-	return json_encode($R);
+	return $R;
+	//return json_encode($R);
     }
 
     public function QueryAlbumList($menu, $artistfirst)
@@ -459,7 +460,8 @@ class MusicDB extends \SQLite3
 	$Stmt->close();
 
 	//print_r($R);
-	return json_encode($R);
+	return $R;
+	//return json_encode($R);
     }
 
     public function QueryNewest()
@@ -481,11 +483,15 @@ class MusicDB extends \SQLite3
 	$Stmt->close();
 
 	//print_r($R);
-	return json_encode($R);
+	return $R;
+	//return json_encode($R);
     }
 
     public function QueryAlphabetPresent($menu)
     {
+	global $ALPHABET_SIZE;
+	global $ALPHABET;
+
         $SelStmt = "SELECT distinct ArtistFirst FROM Album WHERE RootMenuNo == :q1 order by ArtistFirst";
 
 	$Stmt = $this->prepare($SelStmt);
@@ -499,6 +505,7 @@ class MusicDB extends \SQLite3
 	for ($alpha = 0; $alpha < $ALPHABET_SIZE; $alpha++)
 	{
 	    $Letter = $ALPHABET[$alpha];
+	    echo $Letter;
 	    if ($Letter == "#")
 		$R["NUM"] = 0;
 	    else
@@ -518,7 +525,8 @@ class MusicDB extends \SQLite3
 	$Stmt->close();
 
 	//print_r($R);
-	return json_encode($R);
+	return $R;
+	//return json_encode($R);
     }
 
     private function QuearySearch_BuildSelect($words, $mode)
@@ -611,8 +619,9 @@ class MusicDB extends \SQLite3
 	$stmt->close();
 
 
-	//print_r($R);
-	return json_encode($R);
+	print_r($R);
+	return $R;
+	//return json_encode($R);
     }
 
     public function QueryPlayingNow($revno)
@@ -661,8 +670,9 @@ class MusicDB extends \SQLite3
 	    $QueueStmt->close();
 	}
 
-	//print_r($Queue);
-	return json_encode($Queue);
+	print_r($Queue);
+	return $Queue;
+	//return json_encode($Queue);
     }
 
 }

@@ -4,7 +4,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use MusikServerApp\ServerState;
 use MusikServerApp\LPECClient;
-use MusikServerApp\Chat;
+use MusikServerApp\MusicServer;
 
 require_once("src/MusikServerApp/setup.php");
 
@@ -41,11 +41,11 @@ function lpecwrite($socket)
 }
 
 
-$chat = new Chat($ServerState, $LPEC);
+$musicServer = new MusicServer($ServerState, $LPEC);
 $server = IoServer::factory(
     new HttpServer(
 	new WsServer(
-	    $chat
+	    $musicServer
 	)
     ),
     8080

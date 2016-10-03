@@ -10,7 +10,12 @@ use MusikServerApp\LPECClient;
 require_once("setup.php");
 require_once("StringUtils.php");
 
-class Chat implements MessageComponentInterface {
+function isJSON($string,$return_data = false) {
+      $data = json_decode($string);
+     return (json_last_error() == JSON_ERROR_NONE) ? ($return_data ? $data : true) : false;
+}
+
+class MusicServer implements MessageComponentInterface {
     protected $clients;
     protected $serverState;
     protected $LPEC;
@@ -30,30 +35,46 @@ class Chat implements MessageComponentInterface {
 
     public function onMessage(ConnectionInterface $from, $msg) {
 
-	if (strncmp($msg, "ECHO:", 5) == 0)
+	$data = isJSON($msg, true);
+
+	if ($data === false)
+	{
+	    $message = $msg;
+	    $context = false;
+	    echo "$message \n";
+	}
+	else
+	{
+	    echo "$msg \n";
+	    echo print_r($data, true) . "\n";
+	    $message = $data->{"Message"};
+	    $context = $data->{"Context"};
+	    echo "$message \n";
+	}
+
+	if (strncmp($message, "ECHO:", 5) == 0)
 	{
 	    $numRecv = count($this->clients) - 1;
 	    echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-		, $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
+		, $from->resourceId, $message, $numRecv, $numRecv == 1 ? '' : 's');
 
 	    foreach ($this->clients as $client) {
 		if ($from !== $client) {
 		    // The sender is not the receiver, send to each client connected
-		    $client->send($msg);
+		    $client->send($message);
 		}
 	    }
 	    $from->send("ECHO:I have distributed it!");
 	    return;
 	}
-	elseif (strpos($msg, "Query") !== false)
+	elseif (strpos($message, "Query") !== false)
 	{
-	    $this->processQueryMessage($from, $msg);
+	    $this->processQueryMessage($from, $message, $context);
 	    return;
 	    
 	}
 
-	echo "$msg\n";
-	$this->processLinnMessage($from, $msg);
+	$this->processLinnMessage($from, $message);
     }
 
     public function onClose(ConnectionInterface $conn) {
@@ -87,7 +108,7 @@ class Chat implements MessageComponentInterface {
     // Handle one message to Linn - potentially answering back to $from
     private function processLinnMessage($from, $message)
     {
-	LogWrite("Chat::processLinnMessage - $message");
+	LogWrite("MusicServer::processLinnMessage - $message");
 
 	$DataHandled = false;
 
@@ -113,7 +134,7 @@ class Chat implements MessageComponentInterface {
 		$musicDB = new MusicDB();
 		if ($this->LPEC->DeleteAll($musicDB) == false)
 		$Continue = false;
-		if ($this->LPEC-InsertDIDL_list($musicDB, $JukeBoxPlay, $JukeBoxTrack, 0) == false)
+		if ($this->LPEC->InsertDIDL_list($musicDB, $JukeBoxPlay, $JukeBoxTrack, 0) == false)
 		    $Continue = false;
 		$musicDB->close();
 
@@ -485,9 +506,9 @@ class Chat implements MessageComponentInterface {
     }
 
     // Handle one query message - answering back to $from
-    private function processQueryMessage($from, $message)
+    private function processQueryMessage($from, $message, $context)
     {
-	LogWrite("Chat::processQueryMessage - $message");
+	LogWrite("MusicServer::processQueryMessage - $message");
 
 	$DataHandled = false;
 
@@ -498,14 +519,18 @@ class Chat implements MessageComponentInterface {
 
 	$D = getParameters($message);
 
+	$Res = array();
+	$Res["Message"] = $message;
+	$Res["Context"] = $context;
+
 	if (strpos($message, "Query Album ") !== false) 
 	{
 	    //Query Album \"(\d+)\"
 	    $value = $D[0];
 	    $musicDB = new MusicDB();
-	    $Res = $musicDB->QueryAlbum($value);
+	    $Res["Result"] = $musicDB->QueryAlbum($value);
 	    $musicDB->close();
-	    $from->send($Res);
+	    $from->send(json_encode($Res));
 	    $DataHandled = true;
 	}
 	elseif (strpos($message, "Query AlbumList ") !== false) 
@@ -514,18 +539,18 @@ class Chat implements MessageComponentInterface {
 	    $v1 = $D[0];
 	    $v2 = $D[1];
 	    $musicDB = new MusicDB();
-	    $Res = $musicDB->QueryAlbumList($v1, $v2);
+	    $Res["Result"] = $musicDB->QueryAlbumList($v1, $v2);
 	    $musicDB->close();
-	    $from->send($Res);
+	    $from->send(json_encode($Res));
 	    $DataHandled = true;
 	}
 	elseif (strpos($message, "Query Newest") !== false) 
 	{
 	    //Query Newest"
 	    $musicDB = new MusicDB();
-	    $Res = $musicDB->QueryNewest();
+	    $Res["Result"] = $musicDB->QueryNewest();
 	    $musicDB->close();
-	    $from->send($Res);
+	    $from->send(json_encode($Res));
 	    $DataHandled = true;
 	}
 	elseif (strpos($message, "Query AlphabetPresent ") !== false) 
@@ -533,9 +558,9 @@ class Chat implements MessageComponentInterface {
 	    //Query AlphabetPresent \"(\d+)\"
 	    $value = $D[0];
 	    $musicDB = new MusicDB();
-	    $Res = $musicDB->QueryAlphabetPresent($value);
+	    $Res["Result"] = $musicDB->QueryAlphabetPresent($value);
 	    $musicDB->close();
-	    $from->send($Res);
+	    $from->send(json_encode($Res));
 	    $DataHandled = true;
 	}
 	elseif (strpos($message, "Query Search ") !== false) 
@@ -543,9 +568,9 @@ class Chat implements MessageComponentInterface {
 	    //Query Search \"(\d+)\"
 	    $value = $D[0];
 	    $musicDB = new MusicDB();
-	    $Res = $musicDB->QuerySearch($value);
+	    $Res["Result"] = $musicDB->QuerySearch($value);
 	    $musicDB->close();
-	    $from->send($Res);
+	    $from->send(json_encode($Res));
 	    $DataHandled = true;
 	}
 	elseif (strpos($message, "Query PlayingNow ") !== false) 
@@ -553,9 +578,9 @@ class Chat implements MessageComponentInterface {
 	    //Query PlayingNow \"(\d+)\"
 	    $value = $D[0];
 	    $musicDB = new MusicDB();
-	    $Res = $musicDB->QueryPlayingNow($value);
+	    $Res["Result"] = $musicDB->QueryPlayingNow($value);
 	    $musicDB->close();
-	    $from->send($Res);
+	    $from->send(json_encode($Res));
 	    $DataHandled = true;
 	}
 
