@@ -215,9 +215,21 @@ $(function() {
 	var action = $(this).data("musik").action;
 	console.log("a.queuepopupclick: " + action + " = " + Queue.popup.preset + ", " + Queue.popup.track + ", " + volume);
 	if (action != "Cancel") {
-	    jQuery.get("Send.php", { action: action, volume: volume, preset: Queue.popup.preset, track: Queue.popup.track, LinnId: Queue.popup.LinnId } , function (data) {
-	    //alert('Load OK' + data);
-	    });
+	    if (action.indexOf('Queue-') >= 0) {
+		sendthis = new Object();
+		sendthis.Message = action;
+		sendthis.Context = new Object();
+		sendthis.Context.query = 'Queue';
+		sendthis.Context.action = action;
+		sendthis.Context.preset = Queue.popup.preset;
+		sendthis.Context.track = Queue.popup.track;
+		sendthis.Context.LinnId = Queue.popup.LinnId;
+
+		conn.send(JSON.stringify(sendthis));
+	    }
+	    //jQuery.get("Send.php", { action: action, volume: volume, preset: Queue.popup.preset, track: Queue.popup.track, LinnId: Queue.popup.LinnId } , function (data) {
+	    ////alert('Load OK' + data);
+	    //});
 	}
 	$("#" + Queue.popup.popupid).popup('close');
 	return true;
@@ -410,7 +422,7 @@ $(function() {
 
 		conn.send(JSON.stringify(sendthis));
 	    }
-	    else if (action.indexOf('Source-') >= 0)
+	    else if (action.indexOf('Source-') >= 0) {
 		sendthis = new Object();
 		sendthis.Message = action;
 		sendthis.Context = new Object();
@@ -419,7 +431,7 @@ $(function() {
 
 		conn.send(JSON.stringify(sendthis));
 	    }
-	    else if (action.indexOf('Control-') >= 0)
+	    else if (action.indexOf('Control-') >= 0) {
 		sendthis = new Object();
 		sendthis.Message = action;
 		sendthis.Context = new Object();
@@ -428,7 +440,7 @@ $(function() {
 
 		conn.send(JSON.stringify(sendthis));
 	    }
-	    else if (action.indexOf('Volume') >= 0)
+	    else if (action.indexOf('Volume-') >= 0) {
 		sendthis = new Object();
 		sendthis.Message = action;
 		sendthis.Context = new Object();
@@ -442,6 +454,31 @@ $(function() {
 	    //});
 	}
 	return true;
+    });
+
+    $( document ).on( "pagecreate", "#musik", function() {
+	$( "#autocomplete" ).on( "filterablebeforefilter", function ( e, data ) {
+	    var $ul = $( this ),
+                $input = $( data.input ),
+                filtertext = $input.val(),
+                html = "",
+		id = "musik";
+            $ul.html( "" );
+            if ( filtertext && filtertext.length > 2 ) {
+                $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
+                $ul.listview( "refresh" );
+
+		sendthis = new Object();
+		sendthis.Message = 'Query Search "' + filtertext + '"';
+		sendthis.Context = new Object();
+		sendthis.Context.query = 'Query Search';
+		sendthis.Context.id = id;
+		sendthis.Context.filtertext = filtertext;
+		sendthis.Context.ul = "#autocomplete";
+
+		conn.send(JSON.stringify(sendthis));
+            }
+	});
     });
     
     // Change Kontrol volume slider
@@ -594,30 +631,6 @@ $(function() {
     }
 
 
-    $( document ).on( "pagecreate", "#musik", function() {
-	$( "#autocomplete" ).on( "filterablebeforefilter", function ( e, data ) {
-	    var $ul = $( this ),
-                $input = $( data.input ),
-                filtertext = $input.val(),
-                html = "",
-		id = "musik";
-            $ul.html( "" );
-            if ( filtertext && filtertext.length > 2 ) {
-                $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
-                $ul.listview( "refresh" );
-
-		sendthis = new Object();
-		sendthis.Message = 'Query Search "' + filtertext + '"';
-		sendthis.Context = new Object();
-		sendthis.Context.query = 'Query Search';
-		sendthis.Context.id = id;
-		sendthis.Context.filtertext = filtertext;
-		sendthis.Context.ul = "#autocomplete";
-
-		conn.send(JSON.stringify(sendthis));
-            }
-	});
-    });
 });
 
 // Query the device pixel ratio. 

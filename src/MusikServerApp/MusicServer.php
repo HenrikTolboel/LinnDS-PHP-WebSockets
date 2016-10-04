@@ -253,7 +253,7 @@ class MusicServer implements MessageComponentInterface {
 	    // Here things happens - we execute the actions sent from the
 	    // application, by issuing a number of ACTIONs.
 
-	    if (strpos($message, "Volume Set ") !== false) 
+	    if (strpos($message, "Volume-Set ") !== false) 
 	    {
 		//Volume Set \"(\d+)\"
 		$value = $D[0];
@@ -270,7 +270,7 @@ class MusicServer implements MessageComponentInterface {
 		}
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Volume Incr5") !== false) 
+	    elseif (strpos($message, "Volume-Incr5") !== false) 
 	    {
 		//Volume Incr5
 		if ($this->getState()->getState('Volume') < $this->getState()->getState('MAX_VOLUME') -5)
@@ -296,7 +296,7 @@ class MusicServer implements MessageComponentInterface {
 		}
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Volume Incr") !== false) 
+	    elseif (strpos($message, "Volume-Incr") !== false) 
 	    {
 		//Volume Incr
 		if ($this->getState()->getState('Volume') < $this->getState()->getState('MAX_VOLUME'))
@@ -314,7 +314,7 @@ class MusicServer implements MessageComponentInterface {
 		}
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Volume Decr5") !== false) 
+	    elseif (strpos($message, "Volume-Decr5") !== false) 
 	    {
 		//Volume Decr5
 		LogWrite("VolumeDecr: ");
@@ -333,7 +333,7 @@ class MusicServer implements MessageComponentInterface {
 		$this->getState()->setState('Volume', $value);
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Volume Decr") !== false) 
+	    elseif (strpos($message, "Volume-Decr") !== false) 
 	    {
 		//Volume Decr
 		LogWrite("VolumeDecr: ");
@@ -361,7 +361,7 @@ class MusicServer implements MessageComponentInterface {
 	    // Here things happens - we execute the actions sent from the
 	    // application, by issuing a number of ACTIONs.
 
-	    if (strpos($message, "Control Play") !== false) 
+	    if (strpos($message, "Control-Play") !== false) 
 	    {
 		//Control Play
 		if ($this->getState()->getState('TransportState') === "Stopped" || $this->getState()->getState('TransportState') === "Paused")
@@ -372,7 +372,7 @@ class MusicServer implements MessageComponentInterface {
 		}
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Control Pause") !== false) 
+	    elseif (strpos($message, "Control-Pause") !== false) 
 	    {
 		//Control Pause
 		if ($this->getState()->getState('TransportState') !== "Paused")
@@ -390,7 +390,7 @@ class MusicServer implements MessageComponentInterface {
 
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Control Stop") !== false) 
+	    elseif (strpos($message, "Control-Stop") !== false) 
 	    {
 		//Control Stop
 		if ($this->getState()->getState('TransportState') !== "Stopped")
@@ -401,7 +401,7 @@ class MusicServer implements MessageComponentInterface {
 		}
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Control Next") !== false) 
+	    elseif (strpos($message, "Control-Next") !== false) 
 	    {
 		//Control Next
 		if ($this->getState()->getState('TransportState') != "Stopped")
@@ -412,7 +412,7 @@ class MusicServer implements MessageComponentInterface {
 		}
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Control Previous") !== false) 
+	    elseif (strpos($message, "Control-Previous") !== false) 
 	    {
 		//Control Previous
 		if ($this->getState()->getState('TransportState') != "Stopped")
@@ -429,7 +429,7 @@ class MusicServer implements MessageComponentInterface {
 	    // Here things happens - we execute the actions sent from the
 	    // application, by issuing a number of ACTIONs.
 
-	    if (strpos($message, "Source Off") !== false) 
+	    if (strpos($message, "Source-Off") !== false) 
 	    {
 		//Source Off
 		if ($this->getState()->getState('Standby') == "false")
@@ -449,7 +449,7 @@ class MusicServer implements MessageComponentInterface {
 		    $this->getState()->setState('Standby', true);
 		}
 
-		if (strpos($message, "Source Playlist") !== false) 
+		if (strpos($message, "Source-Playlist") !== false) 
 		{
 		    //Source Playlist
 		    if ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'Playlist'))
@@ -461,7 +461,7 @@ class MusicServer implements MessageComponentInterface {
 			$Continue = false;
 		    $DataHandled = true;
 		}
-		elseif (strpos($message, "Source TV") !== false) 
+		elseif (strpos($message, "Source-TV") !== false) 
 		{
 		    //Source TV
 		    if ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'TV'))
@@ -471,7 +471,7 @@ class MusicServer implements MessageComponentInterface {
 		    }
 		    $DataHandled = true;
 		}
-		elseif (strpos($message, "Source Radio") !== false) 
+		elseif (strpos($message, "Source-Radio") !== false) 
 		{
 		    //Source Radio
 		    if ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'Radio'))
@@ -481,7 +481,7 @@ class MusicServer implements MessageComponentInterface {
 		    }
 		    $DataHandled = true;
 		}
-		elseif (strpos($message, "Source NetAux") !== false) 
+		elseif (strpos($message, "Source-NetAux") !== false) 
 		{
 		    //Source NetAux
 		    if ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'Net Aux'))
