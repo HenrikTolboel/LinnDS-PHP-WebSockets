@@ -388,7 +388,7 @@ class MusicDB extends \SQLite3
 	    $result = $Stmt->execute();
 
 	    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-		$A[$row[RootMenuNo]] = $row["count(RootMenuNo)"];
+		$A[$row["RootMenuNo"]] = $row["count(RootMenuNo)"];
 	    }
 
 	    //print_r($A);
@@ -505,7 +505,6 @@ class MusicDB extends \SQLite3
 	for ($alpha = 0; $alpha < $ALPHABET_SIZE; $alpha++)
 	{
 	    $Letter = $ALPHABET[$alpha];
-	    echo $Letter;
 	    if ($Letter == "#")
 		$R["NUM"] = 0;
 	    else
@@ -619,7 +618,7 @@ class MusicDB extends \SQLite3
 	$stmt->close();
 
 
-	print_r($R);
+	//print_r($R);
 	return $R;
 	//return json_encode($R);
     }

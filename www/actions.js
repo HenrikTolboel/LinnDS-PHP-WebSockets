@@ -23,9 +23,17 @@ $(function() {
     Queue.State = "";
     Queue.ScrollTop = -1;
 
-    var conn = new WebSocket('ws://diskstation.local:8080');
+    var conn = new WebSocket('ws://diskstation.local:9052');
+
     conn.onopen = function(e) {
 	console.log("Connection established!");
+
+	var sendthis = new Object();
+	sendthis.Message = 'HTML Body';
+	sendthis.Context = new Object();
+	sendthis.Context.query = 'HTML Body';
+
+	conn.send(JSON.stringify(sendthis));
     };
 
     conn.onmessage = function(e) {
@@ -146,10 +154,15 @@ $(function() {
 		    $.mobile.silentScroll(Queue.ScrollTop - 100);
 		}
 	    }
+	    else if (data.Context.query == 'HTML Body') {
+		var bd = $('body');
+		bd.html(data.Result);
+		bd.pagecontainer("change", "#musik");
+	    }
 	}
 	catch(ee)
 	{
-	    console.log(e.data);
+	    console.log(ee.data);
 		//sendthis = new Object();
 		//sendthis.Message = 'Query AlphabetPresent "' + menu + '"';;
 		//sendthis.Context = new Object();
@@ -182,7 +195,7 @@ $(function() {
 	var action = $(this).data("musik").action;
 	console.log("a.playpopupclick: " + action + " = " + PlayData.preset + ", " + PlayData.track + ", " + volume);
 	if (action != "Cancel") {
-	    sendthis = new Object();
+	    var sendthis = new Object();
 	    sendthis.Message = 'Jukebox ' + action + ' "' + PlayData.preset + '" "' + PlayData.track + '"';
 	    sendthis.Context = new Object();
 	    sendthis.Context.query = 'Jukebox';
@@ -191,10 +204,6 @@ $(function() {
 	    sendthis.Context.track = PlayData.track;
 
 	    conn.send(JSON.stringify(sendthis));
-
-	    //jQuery.get("Send.php", { action: action, volume: volume, preset: PlayData.preset, track: PlayData.track } , function (data) {
-	    ////alert('Load OK' + data);
-	    //});
 	}
 	$("#" + PlayData.popupid).popup('close');
 	return true;
@@ -216,7 +225,7 @@ $(function() {
 	console.log("a.queuepopupclick: " + action + " = " + Queue.popup.preset + ", " + Queue.popup.track + ", " + volume);
 	if (action != "Cancel") {
 	    if (action.indexOf('Queue-') >= 0) {
-		sendthis = new Object();
+		var sendthis = new Object();
 		sendthis.Message = action;
 		sendthis.Context = new Object();
 		sendthis.Context.query = 'Queue';
@@ -227,9 +236,6 @@ $(function() {
 
 		conn.send(JSON.stringify(sendthis));
 	    }
-	    //jQuery.get("Send.php", { action: action, volume: volume, preset: Queue.popup.preset, track: Queue.popup.track, LinnId: Queue.popup.LinnId } , function (data) {
-	    ////alert('Load OK' + data);
-	    //});
 	}
 	$("#" + Queue.popup.popupid).popup('close');
 	return true;
@@ -242,9 +248,18 @@ $(function() {
 	var track  = 0;
 	console.log("button.albumclick: " + action + " = " + preset + ", " + track);
 	if (action != "Cancel") {
-	    jQuery.get("Send.php", { action: action, preset: preset, track: track } , function (data) {
-		//alert('Load OK' + data);
-	    });
+	    var sendthis = new Object();
+	    sendthis.Message = 'Jukebox ' + action + ' "' + preset + '" "' + track + '"';
+	    sendthis.Context = new Object();
+	    sendthis.Context.query = 'Jukebox';
+	    sendthis.Context.action = action;
+	    sendthis.Context.preset = preset;
+	    sendthis.Context.track = track;
+
+	    conn.send(JSON.stringify(sendthis));
+	    //jQuery.get("Send.php", { action: action, preset: preset, track: track } , function (data) {
+		////alert('Load OK' + data);
+	    //});
 	}
 	return true;
     });
@@ -260,7 +275,7 @@ $(function() {
 	
 	if (type == "alphabet") {
 
-	    sendthis = new Object();
+	    var sendthis = new Object();
 	    sendthis.Message = 'Query AlphabetPresent "' + menu + '"';
 	    sendthis.Context = new Object();
 	    sendthis.Context.query = 'Query AlphabetPresent';
@@ -271,7 +286,7 @@ $(function() {
 	    conn.send(JSON.stringify(sendthis));
 	}
 	else if (type == "newest") {
-	    sendthis = new Object();
+	    var sendthis = new Object();
 	    sendthis.Message = 'Query Newest';
 	    sendthis.Context = new Object();
 	    sendthis.Context.query = 'Query AlbumList';
@@ -283,7 +298,7 @@ $(function() {
 	}
 	else
 	{
-	    sendthis = new Object();
+	    var sendthis = new Object();
 	    sendthis.Message = 'Query AlbumList "' + menu + '" "*"';
 	    sendthis.Context = new Object();
 	    sendthis.Context.query = 'Query AlbumList';
@@ -303,7 +318,7 @@ $(function() {
 	AlbumListData.ArtistFirst = $(this).html();
 	console.log("a.alphabetclick: menu: " + SubMenuData.menu + ", type = " + SubMenuData.type + ", artistfirst = " + AlbumListData.ArtistFirst);
 	
-	sendthis = new Object();
+	var sendthis = new Object();
 	sendthis.Message = 'Query AlbumList "' + SubMenuData.menu + '" "' + AlbumListData.ArtistFirst + '"';
 	sendthis.Context = new Object();
 	sendthis.Context.query = 'Query AlbumList';
@@ -331,7 +346,7 @@ $(function() {
 	var first = true;
 	console.log("a.showalbumclick: menu: " + SubMenuData.menu + ", type = " + SubMenuData.type + ", preset = " + PlayData.preset);
 
-	sendthis = new Object();
+	var sendthis = new Object();
 	sendthis.Message = 'Query Album "' + PlayData.preset + '"';
 	sendthis.Context = new Object();
 	sendthis.Context.query = 'Query Album';
@@ -349,7 +364,7 @@ $(function() {
         if (pageId==='queue') {
             console.log('beforeshow Do stuff: ' + pageId);
 
-	    sendthis = new Object();
+	    var sendthis = new Object();
 	    sendthis.Message = 'Query PlayingNow';
 	    sendthis.Context = new Object();
 	    sendthis.Context.query = 'Query PlayingNow';
@@ -412,18 +427,18 @@ $(function() {
 	console.log("button.panelclick: " + action + " = " + preset + ", " + track + ", " + volume);
 	if (action != "Cancel") {
 	    if (action == "PlayRandomTracks") {
-		sendthis = new Object();
-		sendthis.Message = 'Jukebox ' + action + ' "' + PlayData.preset + '" "' + PlayData.track + '"';
+		var sendthis = new Object();
+		sendthis.Message = 'Jukebox ' + action + ' "' + preset + '" "' + track + '"';
 		sendthis.Context = new Object();
 		sendthis.Context.query = 'Jukebox';
 		sendthis.Context.action = action;
-		sendthis.Context.preset = PlayData.preset;
-		sendthis.Context.track = PlayData.track;
+		sendthis.Context.preset = preset;
+		sendthis.Context.track = track;
 
 		conn.send(JSON.stringify(sendthis));
 	    }
 	    else if (action.indexOf('Source-') >= 0) {
-		sendthis = new Object();
+		var sendthis = new Object();
 		sendthis.Message = action;
 		sendthis.Context = new Object();
 		sendthis.Context.query = 'Source';
@@ -432,7 +447,7 @@ $(function() {
 		conn.send(JSON.stringify(sendthis));
 	    }
 	    else if (action.indexOf('Control-') >= 0) {
-		sendthis = new Object();
+		var sendthis = new Object();
 		sendthis.Message = action;
 		sendthis.Context = new Object();
 		sendthis.Context.query = 'Source';
@@ -441,7 +456,7 @@ $(function() {
 		conn.send(JSON.stringify(sendthis));
 	    }
 	    else if (action.indexOf('Volume-') >= 0) {
-		sendthis = new Object();
+		var sendthis = new Object();
 		sendthis.Message = action;
 		sendthis.Context = new Object();
 		sendthis.Context.query = 'Volume';
@@ -449,9 +464,6 @@ $(function() {
 
 		conn.send(JSON.stringify(sendthis));
 	    }
-	    //jQuery.get("Send.php", { action: action, volume: volume, preset: preset, track: track } , function (data) {
-		////alert('Load OK' + data);
-	    //});
 	}
 	return true;
     });
@@ -468,7 +480,7 @@ $(function() {
                 $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
                 $ul.listview( "refresh" );
 
-		sendthis = new Object();
+		var sendthis = new Object();
 		sendthis.Message = 'Query Search "' + filtertext + '"';
 		sendthis.Context = new Object();
 		sendthis.Context.query = 'Query Search';

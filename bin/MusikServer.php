@@ -48,7 +48,7 @@ $server = IoServer::factory(
 	    $musicServer
 	)
     ),
-    8080
+    9052
 );
 
 $server->loop->addReadStream($LPECSTREAM, lpecread);

@@ -9,6 +9,7 @@ use MusikServerApp\LPECClient;
 
 require_once("setup.php");
 require_once("StringUtils.php");
+require_once("html_parts.php");
 
 function isJSON($string,$return_data = false) {
       $data = json_decode($string);
@@ -45,7 +46,7 @@ class MusicServer implements MessageComponentInterface {
 	}
 	else
 	{
-	    echo "$msg \n";
+	    echo "MusicServer::onMessage: $msg \n";
 	    echo print_r($data, true) . "\n";
 	    $message = $data->{"Message"};
 	    $context = $data->{"Context"};
@@ -70,6 +71,12 @@ class MusicServer implements MessageComponentInterface {
 	elseif (strpos($message, "Query") !== false)
 	{
 	    $this->processQueryMessage($from, $message, $context);
+	    return;
+	    
+	}
+	elseif (strpos($message, "HTML") !== false)
+	{
+	    $this->processHtmlMessage($from, $message, $context);
 	    return;
 	    
 	}
@@ -367,7 +374,7 @@ class MusicServer implements MessageComponentInterface {
 		if ($this->getState()->getState('TransportState') === "Stopped" || $this->getState()->getState('TransportState') === "Paused")
 		{
 		    LogWrite("ControlPlay: ");
-		    if ($this->LPEC->CallClients('Play') == false)
+		    if ($this->LPEC->Play() == false)
 			$Continue = false;
 		}
 		$DataHandled = true;
@@ -508,6 +515,7 @@ class MusicServer implements MessageComponentInterface {
     // Handle one query message - answering back to $from
     private function processQueryMessage($from, $message, $context)
     {
+	    echo "Query...\n";
 	LogWrite("MusicServer::processQueryMessage - $message");
 
 	$DataHandled = false;
@@ -573,8 +581,9 @@ class MusicServer implements MessageComponentInterface {
 	    $from->send(json_encode($Res));
 	    $DataHandled = true;
 	}
-	elseif (strpos($message, "Query PlayingNow ") !== false) 
+	elseif (strpos($message, "Query PlayingNow") !== false) 
 	{
+	    echo "Query PlayingNow...\n";
 	    //Query PlayingNow \"(\d+)\"
 	    $value = $D[0];
 	    $musicDB = new MusicDB();
@@ -586,5 +595,35 @@ class MusicServer implements MessageComponentInterface {
 
 	return $DataHandled;
     }
-}
 
+    // Handle one Html message - answering back to $from
+    private function processHtmlMessage($from, $message, $context)
+    {
+	    echo "Html...\n";
+	LogWrite("MusicServer::processHtmlMessage - $message");
+
+	$DataHandled = false;
+
+	if (strpos($message, "HTML") === false)
+	{
+	    return false;
+	}
+
+	$D = getParameters($message);
+
+	$Res = array();
+	$Res["Message"] = $message;
+	$Res["Context"] = $context;
+
+	if (strpos($message, "HTML Body") !== false) 
+	{
+	    //HTML Body
+	    $musicDB = new MusicDB();
+	    $Res["Result"] = Body($musicDB);
+	    $musicDB->close();
+	    $from->send(json_encode($Res));
+	    $DataHandled = true;
+	}
+	return $DataHandled;
+    }
+}
