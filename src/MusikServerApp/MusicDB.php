@@ -73,7 +73,7 @@ class MusicDB extends \SQLite3
 
     function InsertQueueStmt()
     {
-	if ($this->insertQueueStmt == 0)
+	if ($this->insertQueueStmt === 0)
 	    $this->insertQueueStmt = $this->prepare('INSERT INTO Queue (LinnId, AlbumKey, Preset, TrackSeq, URL, XML) VALUES (:LinnId, :AlbumKey, :Preset, :TrackSeq, :URL, :XML)');
 
 	return $this->insertQueueStmt;
@@ -81,7 +81,7 @@ class MusicDB extends \SQLite3
 
     function UpdateQueueStmt()
     {
-	if ($this->updateQueueStmt == 0)
+	if ($this->updateQueueStmt === 0)
 	    $this->updateQueueStmt = $this->prepare('UPDATE Queue set LinnId = :LinnId where (LinnId == :LinnId) OR (LinnId == -1 and URL == :URL)');
 
 	return $this->updateQueueStmt;
@@ -89,7 +89,7 @@ class MusicDB extends \SQLite3
 
     function DeleteQueueStmt()
     {
-	if ($this->deleteQueueStmt == 0)
+	if ($this->deleteQueueStmt === 0)
 	    $this->deleteQueueStmt = $this->prepare('DELETE FROM Queue');
 
 	return $this->deleteQueueStmt;
@@ -98,14 +98,14 @@ class MusicDB extends \SQLite3
 
     function InsertStateStmt()
     {
-	if ($this->insertStateStmt == 0)
+	if ($this->insertStateStmt === 0)
 	    $this->insertStateStmt = $this->prepare('INSERT INTO State (Id, Value) VALUES (:Id, :Value)');
 	return $this->insertStateStmt;
     }
 
     function UpdateStateStmt()
     {
-	if ($this->updateStateStmt == 0)
+	if ($this->updateStateStmt === 0)
 	    $this->updateStateStmt = $this->prepare('UPDATE State set Value = :Value WHERE Id = :Id');
 
 	return $this->updateStateStmt;
@@ -113,7 +113,7 @@ class MusicDB extends \SQLite3
 
     function InsertSequenceStmt()
     {
-	if ($this->insertSequenceStmt == 0)
+	if ($this->insertSequenceStmt === 0)
 	    $this->insertSequenceStmt = $this->prepare('INSERT INTO Sequence (Seq, LinnId) VALUES (:Seq, :LinnId)');
 
 	return $this->insertSequenceStmt;
@@ -121,7 +121,7 @@ class MusicDB extends \SQLite3
 
     function DeleteSequenceStmt()
     {
-	if ($this->deleteSequenceStmt == 0)
+	if ($this->deleteSequenceStmt === 0)
 	    $this->deleteSequenceStmt = $this->prepare('DELETE FROM Sequence');
 
 	return $this->deleteSequenceStmt;
@@ -129,7 +129,7 @@ class MusicDB extends \SQLite3
 
     function NumberOfTracksStmt()
     {
-	if ($this->numberOfTracksStmt == 0)
+	if ($this->numberOfTracksStmt === 0)
 	    $this->numberOfTracksStmt = $this->prepare('SELECT NoTracks FROM Album WHERE Preset == :q1');
 
 	return $this->numberOfTracksStmt;
@@ -137,7 +137,7 @@ class MusicDB extends \SQLite3
 
     function PresetURLStmt()
     {
-	if ($this->presetURLStmt == 0)
+	if ($this->presetURLStmt === 0)
 	    $this->presetURLStmt = $this->prepare('SELECT URI FROM Album WHERE Preset == :q1');
 
 	return $this->presetURLStmt;
@@ -145,7 +145,7 @@ class MusicDB extends \SQLite3
 
     function CheckURLExistStmt()
     {
-	if ($this->CheckURLExistStmt == 0)
+	if ($this->CheckURLExistStmt === 0)
 	    $this->CheckURLExistStmt = $this->prepare('SELECT rowid FROM Album WHERE URI == :q1 LIMIT 1');
 	    //$this->CheckURLExistStmt = $this->prepare('SELECT EXISTS(SELECT rowid FROM Album WHERE URI == :q1 LIMIT 1)');
 
@@ -154,7 +154,7 @@ class MusicDB extends \SQLite3
 
     function InsertAlbumStmt()
     {
-	if ($this->insertAlbumStmt == 0)
+	if ($this->insertAlbumStmt === 0)
 	    $this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Key, Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Key, :Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
 
 	return $this->insertAlbumStmt;
@@ -162,7 +162,7 @@ class MusicDB extends \SQLite3
 
     function InsertTracksStmt()
     {
-	if ($this->insertTracksStmt == 0)
+	if ($this->insertTracksStmt === 0)
 	    $this->insertTracksStmt = $this->prepare('INSERT INTO Tracks (AlbumKey, Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount, BitRate, SampleFrequency, BitsPerSample, Size) VALUES  (:AlbumKey, :Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount, :BitRate, :SampleFrequency, :BitsPerSample, :Size)');
 
 	return $this->insertTracksStmt;
