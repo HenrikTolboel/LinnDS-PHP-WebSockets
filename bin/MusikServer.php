@@ -8,19 +8,22 @@ use MusikServerApp\MusicServer;
 
 require_once("src/MusikServerApp/setup.php");
 
+echo "__DIR__=" . dirname(__DIR__) . "\n";
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 
-SetLogFile(dirname($argv[0]) . "/logfile.txt");
+//SetLogFile(dirname($argv[0]) . "/logfile.txt");
+SetLogFile(dirname(__DIR__) . "/logfile.txt");
 
 LogWrite("############################## Restarted ######################################");
 
 $ServerState = ServerState::getInstance();
 
-$LPECSTREAM = "";
-	$LPECSTREAM = stream_socket_client('tcp://192.168.0.12:23', $errno, $errstr);
-	echo "socket: $LPECSTREAM, $errno, $errstr\n";
+$LinnAdr = 'tcp://' . $LINN_HOST . ':' . $LINN_PORT;
+echo "Linn DS at: " . $LinnAdr . "\n";
+$LPECSTREAM = stream_socket_client($LinnAdr, $errno, $errstr);
+echo "socket: $LPECSTREAM, $errno, $errstr\n";
 
 $LPEC = LPECClient::getInstance($LPECSTREAM, $ServerState, 20480);
 
@@ -29,19 +32,14 @@ $LPEC = LPECClient::getInstance($LPECSTREAM, $ServerState, 20480);
 function lpecread($socket)
 {
     global $LPEC;
-    //$resp = fread($socket, 30000);
+
     $resp = stream_get_line($socket, 30000, "\r\n");
     //LogWrite("lpecread: $resp");
     return $LPEC->processMessage($resp);
 }
 
-function lpecwrite($socket)
-{
-    //fwrite($socket, "SUBSCRIBE Ds/Volume\n");
-}
-
-
 $musicServer = new MusicServer($ServerState, $LPEC);
+
 $server = IoServer::factory(
     new HttpServer(
 	new WsServer(
@@ -51,12 +49,9 @@ $server = IoServer::factory(
     9052
 );
 
-$server->loop->addReadStream($LPECSTREAM, lpecread);
-//$server->loop->addWriteStream($LPECSTREAM, lpecwrite);
-//$server->loop->addReadStream($LPECSTREAM, array('lpecreader',read));
+$server->loop->addReadStream($LPECSTREAM, 'lpecread');
 // LPECSTREAM is inserted in main event loop, and when something
 // available, the callable function (array(....)) is called.
 
-lpecwrite($LPECSTREAM);
 $server->run();
 
