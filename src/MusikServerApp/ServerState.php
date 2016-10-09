@@ -49,7 +49,10 @@ class ServerState
     public function setState($name, $value)
     {
 	$this->State[$name] = $value;
-	LogWrite("ServerState:setState[$name]=$value");
+	if (is_array($value))
+	    LogWrite("ServerState:setState[$name]=" . print_r($value, true));
+	else
+	    LogWrite("ServerState:setState[$name]=$value");
     }
 
     public function getState($name)
@@ -107,7 +110,4 @@ class ServerState
     }
 
 }
-
-
-
 ?>
