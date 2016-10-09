@@ -246,6 +246,7 @@ class LPECClient
 	    die("IncrRevNo: RevNo is false");
 	$RevNo = $RevNo + 1;
 	$this->getState()->setState('RevNo', $RevNo);
+	//echo "LPECClient::IncrRevNo: RevNo=$RevNo \n";
 	$musicDB->SetState('RevNo', $RevNo);
 
     }
@@ -423,54 +424,54 @@ class LPECClient
 	    {
 		if (strpos($message, "SourceIndex ") !== false)
 		{
-		    $this->getState()->setState('SourceIndex', $E[SourceIndex]);
+		    $this->getState()->setState('SourceIndex', $E['SourceIndex']);
 		}
 		if (strpos($message, "ProductModel ") !== false)
 		{
-		    $this->getState()->setState('ProductModel', $E[ProductModel]);
+		    $this->getState()->setState('ProductModel', $E['ProductModel']);
 		}
 		if (strpos($message, "ProductName ") !== false)
 		{
-		    $this->getState()->setState('ProductName', $E[ProductName]);
+		    $this->getState()->setState('ProductName', $E['ProductName']);
 		}
 		if (strpos($message, "ProductRoom ") !== false)
 		{
-		    $this->getState()->setState('ProductRoom', $E[ProductRoom]);
+		    $this->getState()->setState('ProductRoom', $E['ProductRoom']);
 		}
 		if (strpos($message, "ProductType ") !== false)
 		{
-		    $this->getState()->setState('ProductType', $E[ProductType]);
+		    $this->getState()->setState('ProductType', $E['ProductType']);
 		}
 		if (strpos($message, "Standby ") !== false)
 		{
-		    $this->getState()->setState('Standby', $E[Standby]);
+		    $this->getState()->setState('Standby', $E['Standby']);
 		    $musicDB = new MusicDB();
-		    $musicDB->SetState("Standby", $E[Standby]);
+		    $musicDB->SetState("Standby", $E['Standby']);
 		    $musicDB->close();
 		}
 		if (strpos($message, "ProductUrl ") !== false)
 		{
-		    $this->getState()->setState('ProductUrl', $E[ProductUrl]);
+		    $this->getState()->setState('ProductUrl', $E['ProductUrl']);
 		}
 		if (strpos($message, "Attributes ") !== false)
 		{
-		    $this->getState()->setState('Attributes', $E[Attributes]);
-		    if (strpos($E[Attributes], "Volume") !== false) // We have a Volume service
+		    $this->getState()->setState('Attributes', $E['Attributes']);
+		    if (strpos($E['Attributes'], "Volume") !== false) // We have a Volume service
 		    {
 			$this->Send("SUBSCRIBE Ds/Volume");
 		    }
-		    if (strpos($E[Attributes], "Info") !== false) // We have a Info service
+		    if (strpos($E['Attributes'], "Info") !== false) // We have a Info service
 		    {
 			//$this->Send("SUBSCRIBE Ds/Info");
 		    }
-		    if (strpos($E[Attributes], "Time") !== false) // We have a Time service
+		    if (strpos($E['Attributes'], "Time") !== false) // We have a Time service
 		    {
 			//$this->Send("SUBSCRIBE Ds/Time");
 		    }
 		}
 		if (strpos($message, "SourceCount ") !== false)
 		{
-		    for ($i = 0; $i < $E[SourceCount]; $i++) 
+		    for ($i = 0; $i < $E['SourceCount']; $i++) 
 		    {
 			$this->Send("ACTION Ds/Product 1 Source \"" . $i . "\"");
 		    }
@@ -481,53 +482,53 @@ class LPECClient
 	    {
 		if (strpos($message, "TransportState ") !== false)
 		{
-		    $this->getState()->setState('TransportState', $E[TransportState]);
+		    $this->getState()->setState('TransportState', $E['TransportState']);
 		    $musicDB = new MusicDB();
-		    $musicDB->SetState("TransportState", $E[TransportState]);
+		    $musicDB->SetState("TransportState", $E['TransportState']);
 		    $musicDB->close();
 		}
 		if (strpos($message, "Id ") !== false)
 		{
-		    $this->getState()->setState('Id', $E[Id]);
+		    $this->getState()->setState('Id', $E['Id']);
 		    $musicDB = new MusicDB();
-		    $musicDB->SetState("LinnId", $E[Id]);
+		    $musicDB->SetState("LinnId", $E['Id']);
 		    $musicDB->close();
 		}
 		if (strpos($message, "IdArray ") !== false)
 		{
-		    $this->getState()->setState('IdArray_base64', $E[IdArray]);
-		    $this->getState()->setState('IdArray', unpack("N*", base64_decode($E[IdArray])));
+		    $this->getState()->setState('IdArray_base64', $E['IdArray']);
+		    $this->getState()->setState('IdArray', unpack("N*", base64_decode($E['IdArray'])));
 		    $musicDB = new MusicDB();
 		    $this->CheckPlaylist($musicDB);
 		    $musicDB->close();
 		}
 		if (strpos($message, "Shuffle ") !== false)
 		{
-		    $this->getState()->setState('Shuffle', $E[Shuffle]);
+		    $this->getState()->setState('Shuffle', $E['Shuffle']);
 		}
 		if (strpos($message, "Repeat ") !== false)
 		{
-		    $this->getState()->setState('Repeat', $E[Repeat]);
+		    $this->getState()->setState('Repeat', $E['Repeat']);
 		}
 		if (strpos($message, "TrackDuration ") !== false)
 		{
-		    $this->getState()->setState('TrackDuration', $E[TrackDuration]);
+		    $this->getState()->setState('TrackDuration', $E['TrackDuration']);
 		}
 		if (strpos($message, "TrackCodecName ") !== false)
 		{
-		    $this->getState()->setState('TrackCodecName', $E[TrackCodecName]);
+		    $this->getState()->setState('TrackCodecName', $E['TrackCodecName']);
 		}
 		if (strpos($message, "TrackSampleRate ") !== false)
 		{
-		    $this->getState()->setState('TrackSampleRate', $E[TrackSampleRate]);
+		    $this->getState()->setState('TrackSampleRate', $E['TrackSampleRate']);
 		}
 		if (strpos($message, "TrackBitRate ") !== false)
 		{
-		    $this->getState()->setState('TrackBitRate', $E[TrackBitRate]);
+		    $this->getState()->setState('TrackBitRate', $E['TrackBitRate']);
 		}
 		if (strpos($message, "TrackLossless ") !== false)
 		{
-		    $this->getState()->setState('TrackLossless', $E[TrackLossless]);
+		    $this->getState()->setState('TrackLossless', $E['TrackLossless']);
 		}
 		$DataHandled = true;
 	    }
@@ -536,16 +537,16 @@ class LPECClient
 		if (strpos($message, "Volume ") !== false)
 		{
 		    LogWrite("Event Volume");
-		    $this->getState()->setState('Volume', $E[Volume]);
+		    $this->getState()->setState('Volume', $E['Volume']);
 		    $musicDB = new MusicDB();
-		    $musicDB->SetState("Volume", $E[Volume]);
+		    $musicDB->SetState("Volume", $E['Volume']);
 		    $musicDB->close();
 		}
 		if (strpos($message, "Mute ") !== false)
 		{
-		    $this->getState()->setState('Mute', $E[Mute]);
+		    $this->getState()->setState('Mute', $E['Mute']);
 		    $musicDB = new MusicDB();
-		    $musicDB->SetState("Mute", $E[Mute]);
+		    $musicDB->SetState("Mute", $E['Mute']);
 		    $musicDB->close();
 		}
 		$DataHandled = true;
@@ -554,11 +555,11 @@ class LPECClient
 	    {
 		if (strpos($message, "CurrentPreset ") !== false)
 		{
-		    $this->getState()->setState('CurrentPreset', $E[CurrentPreset]);
+		    $this->getState()->setState('CurrentPreset', $E['CurrentPreset']);
 		}
 		if (strpos($message, "CurrentBookmark ") !== false)
 		{
-		    $this->getState()->setState('CurrentBookmark', $E[CurrentBookmark]);
+		    $this->getState()->setState('CurrentBookmark', $E['CurrentBookmark']);
 		}
 		$DataHandled = true;
 	    }
