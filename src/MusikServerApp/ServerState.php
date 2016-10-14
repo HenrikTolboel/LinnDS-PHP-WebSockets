@@ -46,6 +46,11 @@ class ServerState
 	return $inst;
     }
 
+    public function StateArray()
+    {
+	return $this->State;
+    }
+
     public function setState($name, $value)
     {
 	$this->State[$name] = $value;

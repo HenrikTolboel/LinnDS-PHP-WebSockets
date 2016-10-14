@@ -11,11 +11,6 @@ require_once("setup.php");
 require_once("StringUtils.php");
 require_once("html_parts.php");
 
-function isJSON($string,$return_data = false) {
-      $data = json_decode($string);
-     return (json_last_error() == JSON_ERROR_NONE) ? ($return_data ? $data : true) : false;
-}
-
 class MusicServer implements MessageComponentInterface {
     protected $clients;
     protected $serverState;
@@ -100,7 +95,7 @@ class MusicServer implements MessageComponentInterface {
     // END MessageComponentInterface
 
     // Send to all websocket clients
-    public function SendAll($Message)
+    public function SendAll($msg)
     {
         foreach ($this->clients as $client) {
 	    $client->send($msg);
@@ -110,6 +105,17 @@ class MusicServer implements MessageComponentInterface {
     private function getState()
     {
 	return $this->serverState;
+    }
+
+    public function SendStateToAll()
+    {
+	$Res = array();
+	$Res["Message"] = "State";
+	$Res["Context"] = "";
+
+	$Res["Result"] = $this->getState()->StateArray();
+
+	$this->SendAll(json_encode($Res));
     }
 
     // Handle one message to Linn - potentially answering back to $from
@@ -351,7 +357,7 @@ class MusicServer implements MessageComponentInterface {
 		$this->getState()->setState('Volume', $value);
 		$DataHandled = true;
 	    }
-	    elseif (strpos($message, "Volume Reset") !== false) 
+	    elseif (strpos($message, "Volume-Reset") !== false) 
 	    {
 		//Volume Reset
 		LogWrite("VolumeReset: ");

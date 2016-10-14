@@ -109,4 +109,9 @@ function getEvent($str)
     return $b;
 }
 
+function isJSON($string,$return_data = false) {
+      $data = json_decode($string);
+     return (json_last_error() == JSON_ERROR_NONE) ? ($return_data ? $data : true) : false;
+}
+
 ?>

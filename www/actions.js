@@ -45,7 +45,17 @@ $(function() {
 	    console.log(data.Context);
 	    console.log(data.Result);
 
-	    if (data.Context.query == 'Query AlphabetPresent') {
+	    if (data.Message == 'State' && data.Context == ""){
+		// A server side generated State
+
+		var Vol = data.Result.Volume;
+		$('div.ShowVolume').each(function() {
+		    $(this).html(Vol);
+		});
+		QueueMarkings(data.Result.RevNo, data.Result.Id);
+		    
+	    }
+	    else if (data.Context.query == 'Query AlphabetPresent') {
 		$("#alphabet-title").html(data.Context.title);
 		$.each( data.Result, function ( i, val ) {
 		    if (val == 1)
@@ -118,41 +128,11 @@ $(function() {
 		{
 		    $("#queue-list").html( html );
 		    //$("#queue-list").listview( "refresh" );
+		    
+		    Queue.CurLinnId = -1; // Force mariking we have new html
 		}
 
-	        var this_li = $("#queue-"+Queue.State.LinnId);
-
-	        if (html != "" || Queue.CurLinnId != Queue.State.LinnId) {
-		    var t;
-		    t = this_li.prevAll().attr("data-icon", "check").children();
-		    t.filter("a.showalbumclick").removeClass("ui-icon-audio").removeClass("ui-icon-carat-r").addClass("ui-icon-check");
-		    t.filter("a.queuepopup").addClass("ui-disabled");
-
-		    t = this_li.attr("data-icon", "audio").children();
-		    t.filter("a.showalbumclick").removeClass("ui-icon-check").removeClass("ui-icon-carat-r").addClass("ui-icon-audio");
-		    t.filter("a.queuepopup").removeClass("ui-disabled");
-
-		    t = this_li.nextAll().attr("data-icon", "carat-r").children();
-		    t.filter("a.showalbumclick").removeClass("ui-icon-audio").removeClass("ui-icon-check").addClass("ui-icon-carat-r");
-		    t.filter("a.queuepopup").removeClass("ui-disabled");
-
-		}
-	        Queue.RevNo = Queue.State.RevNo;
-	        Queue.CurLinnId = Queue.State.LinnId;
-
-		$("#queue-list").listview( "refresh" );
-
-	        this_li = $("#queue-"+Queue.CurLinnId);
-		var Pos = this_li.offset();
-		if (Pos !== undefined && Pos.top > 100)
-		{
-		    $.mobile.silentScroll(Pos.top - 100);
-		    Queue.ScrollTop = Pos.top;
-		}
-		else if (Queue.ScrollTop != -1)
-		{
-		    $.mobile.silentScroll(Queue.ScrollTop - 100);
-		}
+		QueueMarkings(Queue.State.RevNo, Queue.State.LinnId);
 	    }
 	    else if (data.Context.query == 'HTML Body') {
 		var bd = $('body');
@@ -172,6 +152,41 @@ $(function() {
 		//sendthis.Context.title = title;
 	}
     };
+
+    function QueueMarkings(RevNo, LinnId) {
+	var this_li = $("#queue-"+LinnId);
+
+	if (Queue.CurLinnId != LinnId) {
+	    var t;
+	    t = this_li.prevAll().attr("data-icon", "check").children();
+	    t.filter("a.showalbumclick").removeClass("ui-icon-audio").removeClass("ui-icon-carat-r").addClass("ui-icon-check");
+	    t.filter("a.queuepopup").addClass("ui-disabled");
+
+	    t = this_li.attr("data-icon", "audio").children();
+	    t.filter("a.showalbumclick").removeClass("ui-icon-check").removeClass("ui-icon-carat-r").addClass("ui-icon-audio");
+	    t.filter("a.queuepopup").removeClass("ui-disabled");
+
+	    t = this_li.nextAll().attr("data-icon", "carat-r").children();
+	    t.filter("a.showalbumclick").removeClass("ui-icon-audio").removeClass("ui-icon-check").addClass("ui-icon-carat-r");
+	    t.filter("a.queuepopup").removeClass("ui-disabled");
+	}
+	Queue.RevNo = RevNo;
+	Queue.CurLinnId = LinnId;
+
+	$("#queue-list").listview( "refresh" );
+
+	this_li = $("#queue-"+Queue.CurLinnId);
+	var Pos = this_li.offset();
+	if (Pos !== undefined && Pos.top > 100)
+	{
+	    $.mobile.silentScroll(Pos.top - 100);
+	    Queue.ScrollTop = Pos.top;
+	}
+	else if (Queue.ScrollTop != -1)
+	{
+	    $.mobile.silentScroll(Queue.ScrollTop - 100);
+	}
+    }
 
     // This one is called when clicking to open a playpopup.
     $('body').delegate("a.playpopup", "click", function() {

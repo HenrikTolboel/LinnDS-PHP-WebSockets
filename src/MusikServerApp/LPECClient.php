@@ -12,10 +12,9 @@ namespace MusikServerApp;
 
 use MusikServerApp\ServerState;
 use MusikServerApp\MusicDB;
+use MusikServerApp\MusicServer;
 
 require_once("setup.php");
-//require_once("SocketServer.php");
-//require_once("MusicDB.php");
 require_once("StringUtils.php");
 
 
@@ -33,7 +32,7 @@ class LPECClient
 
 	$this->InitLPECClient();
     }
-    
+
     // Queue is a queue of outstanding commands to be sent to Linn.
     // The currently executing command is still in the queue, removed when the
     // response commes.
@@ -79,46 +78,6 @@ class LPECClient
 	$this->IncrRevNo($musicDB);
 	$musicDB->close();
     }
-
-    private function XXReadBlockFromSocket($socket)
-    {
-	// read until newline or 30000 bytes
-	// socket_read will show errors when the client is disconnected, so silence the error messages
-	//LogWrite("ReadBlockFromSocket: begin");
-	$res = "";
-
-	do {
-	    $data = @socket_read($socket, 30000, PHP_NORMAL_READ);
-
-	    if ($data === false) 
-	    {
-		if ($res != "")
-		{
-		    //LogWrite("ReadBlockFromSocket-false: end - res: $res");
-
-		    return $res;
-		}
-		else
-		{
-		    //LogWrite("ReadBlockFromSocket-false: end - false");
-		    return false;
-		}
-	    }
-
-	    //LogWrite("ReadBlockFromSocket-addData: " . strlen($data));
-
-	    $res .= $data;
-	    $cnt = substr_count($res, '"');
-	    //LogWrite("cnt: " . $cnt);
-	} while ($cnt != 0 && $cnt % 2 != 0);
-
-	// trim off the trailing/beginning white spaces
-	$res = trim($res);
-
-	//LogWrite("ReadBlockFromSocket: end - $res");
-	return $res;
-    }
-    
 
     private function getState()
     {
@@ -296,26 +255,30 @@ class LPECClient
 
     // Handle a line received from Linn LPEC. All lines read from Linn
     // socket should be read here and only here
+    //
+    // return 0 if data was not handled
+    // return 1 if data was handled
+    // return 2 if data was handled and state was changed
     public function processMessage($message)
     {
 	$DEBUG = 3;
 	LogWrite("LPECClientSocket::processMessage - $message");
     
-	$DataHandled = false;
+	$DataHandled = 0;
 	if (strpos($message, "ALIVE Ds") !== false)
 	{
 	    $this->Send("SUBSCRIBE Ds/Product");
-	    $DataHandled = true;
+	    $DataHandled = 1;
 	}
 	elseif (strpos($message, "ALIVE") !== false)
 	{
 	    LogWrite("ALIVE ignored : " . $message);
-	    $DataHandled = true;
+	    $DataHandled = 1;
 	}
 	elseif (strpos($message, "ERROR") !== false)
 	{
 	    LogWrite("ERROR ignored : " . $message);
-	    $DataHandled = true;
+	    $DataHandled = 1;
 	}
 	elseif (strpos($message, "SUBSCRIBE") !== false)
 	{
@@ -331,7 +294,7 @@ class LPECClient
 	    $S2 = substr($message, 10);
 	    $this->SubscribeType[$S1] = $S2;
 	    $this->Send("");
-	    $DataHandled = true;
+	    $DataHandled = 1;
 	}
 	elseif (strpos($message, "RESPONSE") !== false)
 	{
@@ -411,7 +374,7 @@ class LPECClient
 	    }
 
 	    $this->Send("");
-	    $DataHandled = true;
+	    $DataHandled = 1;
 	}
 	elseif (strpos($message, "EVENT ") !== false)
 	{
@@ -476,7 +439,7 @@ class LPECClient
 			$this->Send("ACTION Ds/Product 1 Source \"" . $i . "\"");
 		    }
 		}
-		$DataHandled = true;
+		$DataHandled = 2;
 	    }
 	    elseif (strpos($message, "EVENT " . $this->SubscribeType['Ds/Playlist']) !== false)
 	    {
@@ -530,7 +493,7 @@ class LPECClient
 		{
 		    $this->getState()->setState('TrackLossless', $E['TrackLossless']);
 		}
-		$DataHandled = true;
+		$DataHandled = 2;
 	    }
 	    elseif (strpos($message, "EVENT " . $this->SubscribeType['Ds/Volume']) !== false)
 	    {
@@ -549,7 +512,7 @@ class LPECClient
 		    $musicDB->SetState("Mute", $E['Mute']);
 		    $musicDB->close();
 		}
-		$DataHandled = true;
+		$DataHandled = 2;
 	    }
 	    elseif (strpos($message, "EVENT " . $this->SubscribeType['Ds/Jukebox']) !== false)
 	    {
@@ -561,12 +524,12 @@ class LPECClient
 		{
 		    $this->getState()->setState('CurrentBookmark', $E['CurrentBookmark']);
 		}
-		$DataHandled = true;
+		$DataHandled = 2;
 	    }
 	    else
 	    {
 		LogWrite("UNKNOWN : " . $message);
-		$DataHandled = true;
+		$DataHandled = 1;
 	    }
 	}
 	return $DataHandled;

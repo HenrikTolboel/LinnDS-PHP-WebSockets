@@ -633,8 +633,8 @@ class MusicDB extends \SQLite3
 
 	while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
 	{
-	    $Queue[0][MaxSeq] = $row[MaxSeq];
-	    $Queue[0][MaxLinnId] = $row[MaxLinnId];
+	    $Queue[0]['MaxSeq'] = $row['MaxSeq'];
+	    $Queue[0]['MaxLinnId'] = $row['MaxLinnId'];
 	}
 	$Stmt->close();
 
@@ -643,11 +643,11 @@ class MusicDB extends \SQLite3
 
 	while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
 	{
-	    $Queue[0][$row[Id]] = $row[Value];
+	    $Queue[0][$row['Id']] = $row['Value'];
 	}
 	$Stmt->close();
 
-	if ($revno == -1 || $Queue[0][RevNo] != $revno)
+	if ($revno == -1 || $Queue[0]['RevNo'] != $revno)
 	{
 	    $QueueStmt = $this->prepare("SELECT S.Seq-L.Seq AS PlayState, Q.LinnId AS LinnId, S.Seq AS Seq, T.* FROM Queue Q, Sequence S, Tracks T, (SELECT S2.Seq FROM Sequence S2, (SELECT ST.value FROM State ST where ST.Id == 'LinnId') L2 WHERE S2.LinnId == L2.value) L WHERE Q.LinnId == S.LinnId AND Q.Preset == T.Preset AND Q.TrackSeq == T.TrackSeq ORDER BY S.Seq");
 
@@ -656,12 +656,12 @@ class MusicDB extends \SQLite3
 
 	    $QueueCount = 1;
 	    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-		if ($row[PlayState] < 0)
-		    $row[PlayState] = "Played";
-		else if ($row[PlayState] > 0)
-		    $row[PlayState] = "Pending";
+		if ($row['PlayState'] < 0)
+		    $row['PlayState'] = "Played";
+		else if ($row['PlayState'] > 0)
+		    $row['PlayState'] = "Pending";
 		else
-		    $row[PlayState] = "Playing";
+		    $row['PlayState'] = "Playing";
 		$Queue[$QueueCount] = AbsoluteURL($row);
 		$QueueCount++;
 	    }

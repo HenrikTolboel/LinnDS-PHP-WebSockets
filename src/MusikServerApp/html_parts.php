@@ -279,7 +279,7 @@ function KontrolPanel_panel($musicDB, $id)
 		<a href="#" data-rel="close">Close</a>
 	    </li>
 	</ul>
-	<h4>Volume</h4>
+	<h4>Volume <div class="ShowVolume">30</div></h4>
 	<div data-role="controlgroup" data-type="horizontal">
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Volume-Decr5"}'>-5</button>
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Volume-Decr"}'>-1</button>

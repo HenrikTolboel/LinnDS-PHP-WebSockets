@@ -8,31 +8,19 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
-//$PRESETS_DIR  = "../_Presets";
-//$CACHE_DIR  = "./tmp";
-
-//$DO_CACHE = false;
-//$DO_CACHE = true;
-
-//$USE_DIALOG = true;
-
 $NL = "\n";
 $SQ = "'";
 $DQ = '"';
 $DIR_DELIM = "/";
 
+echo "setup.php: __DIR__=" . dirname(__DIR__) . "\n";
+
 $DATABASE_FILENAME = "/Users/henrik/Documents/Projekter/composer/LinnDS-jukebox.db";
 //$QUEUEDB_FILENAME = "QueueDB.db";
 $QUEUEDB_FILENAME = $DATABASE_FILENAME;
 
-//$manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
-
 // These 2 "path" are equal on your music server. I.e. files search in the 
 // http url are found locally in the path...
-
-//$LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
-//$LINN_JUKEBOX_PATH = "/musik";
-
 $LINN_JUKEBOX_URL = "http://192.168.0.11/MusicLib";
 $LINN_JUKEBOX_PATH = "/volume1/web/MusicLib";
 
