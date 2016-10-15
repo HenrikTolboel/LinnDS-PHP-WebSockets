@@ -60,7 +60,7 @@ class MusicServer implements MessageComponentInterface {
 		    $client->send($message);
 		}
 	    }
-	    $from->send("ECHO:I have distributed it!");
+	    $from->send("ECHO:I have distributed your message!");
 	    return;
 	}
 	elseif (strpos($message, "Query") !== false)
@@ -76,7 +76,7 @@ class MusicServer implements MessageComponentInterface {
 	    
 	}
 
-	$this->processLinnMessage($from, $message);
+	$this->processLinnMessage($from, $message, $context);
     }
 
     public function onClose(ConnectionInterface $conn) {
@@ -119,7 +119,7 @@ class MusicServer implements MessageComponentInterface {
     }
 
     // Handle one message to Linn - potentially answering back to $from
-    private function processLinnMessage($from, $message)
+    private function processLinnMessage($from, $message, $context)
     {
 	LogWrite("MusicServer::processLinnMessage - $message");
 
@@ -509,9 +509,14 @@ class MusicServer implements MessageComponentInterface {
 	elseif (strpos($message, "State") !== false) 
 	{
 	    LogWrite("HTState: " . $this->getState()->dump());
-	    $seri = $this->getState()->Serialize();
-	    LogWrite("Serialized: " . $seri);
-	    $from->send($seri); // answer State back to caller ($from)
+
+	    $Res = array();
+	    $Res["Message"] = $message;
+	    $Res["Context"] = $context;
+	    $Res["Result"] = $this->getState()->StateArray();
+
+	    $from->send(json_encode($Res));
+
 	    $DataHandled = true;
 	}
 

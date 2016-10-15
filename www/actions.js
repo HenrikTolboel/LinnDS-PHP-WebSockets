@@ -45,11 +45,10 @@ $(function() {
 	    console.log(data.Context);
 	    console.log(data.Result);
 
-	    if (data.Message == 'State' && data.Context == ""){
-		// A server side generated State
+	    if (data.Message == 'State'){
 
 		var Vol = data.Result.Volume;
-		$('div.ShowVolume').each(function() {
+		$('span.ShowVolume').each(function() {
 		    $(this).html(Vol);
 		});
 		QueueMarkings(data.Result.RevNo, data.Result.Id);
@@ -138,6 +137,15 @@ $(function() {
 		var bd = $('body');
 		bd.html(data.Result);
 		bd.pagecontainer("change", "#musik");
+
+		// update html with state information
+		var sendthis = new Object();
+		sendthis.Message = 'State';
+		sendthis.Context = new Object();
+		sendthis.Context.action = 'State';
+
+		conn.send(JSON.stringify(sendthis));
+
 	    }
 	}
 	catch(ee)
@@ -175,16 +183,19 @@ $(function() {
 
 	$("#queue-list").listview( "refresh" );
 
-	this_li = $("#queue-"+Queue.CurLinnId);
-	var Pos = this_li.offset();
-	if (Pos !== undefined && Pos.top > 100)
-	{
-	    $.mobile.silentScroll(Pos.top - 100);
-	    Queue.ScrollTop = Pos.top;
-	}
-	else if (Queue.ScrollTop != -1)
-	{
-	    $.mobile.silentScroll(Queue.ScrollTop - 100);
+        var pageId = $('body').pagecontainer('getActivePage').prop('id'); 
+	if (pageId == "queue") {
+	    this_li = $("#queue-"+Queue.CurLinnId);
+	    var Pos = this_li.offset();
+	    if (Pos !== undefined && Pos.top > 100)
+	    {
+		$.mobile.silentScroll(Pos.top - 100);
+		Queue.ScrollTop = Pos.top;
+	    }
+	    else if (Queue.ScrollTop != -1)
+	    {
+		$.mobile.silentScroll(Queue.ScrollTop - 100);
+	    }
 	}
     }
 
