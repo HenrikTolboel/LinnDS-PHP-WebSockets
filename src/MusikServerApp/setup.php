@@ -34,6 +34,12 @@ $BUILD_PATH1 = "/Volumes/MacDATA/Users/henrik/nobackup/MusicLib";
 $BUILD_PATH2 = "/Users/henrik/nobackup/MusicLib";
 $BUILD_PATH = "/Volumes/web/MusicLib";
 
+echo "gethostname: " . gethostname() . $NL;
+if (gethostname() == "DiskStation")
+{
+    $BUILD_PATH = $LINN_JUKEBOX_PATH;
+}
+
 // These directories are scanned for ".dpl" files
 // Each directory maps into one of the RootMenu entries.
 $TopDirectory = array();

@@ -74,7 +74,7 @@ class LPECClient
 	$this->SubscribeType['Ds/Info'] = -1;
 	$this->SubscribeType['Ds/Time'] = -1;
 
-	$musicDB = new MusicDB();
+	$musicDB = MusicDB::connect();
 	$this->IncrRevNo($musicDB);
 	$musicDB->close();
     }
@@ -340,7 +340,7 @@ class LPECClient
 
 		$this->getState()->setStateArray('PlaylistURLs', $F[0], $D[0]);
 		$this->getState()->setStateArray('PlaylistXMLs', $F[0], $D[1]);
-		$musicDB = new MusicDB();
+		$musicDB = MusicDB::connect();
 		$musicDB->UpdateQueue($F[0], "", -1, -1, $D[0], $D[1]);
 		$musicDB->close();
 	    }
@@ -354,7 +354,7 @@ class LPECClient
 		$this->getState()->setState('NewId', $D[0]);
 		$this->getState()->setStateArray('PlaylistURLs', $D[0], $F[1]);
 		$this->getState()->setStateArray('PlaylistXMLs', $D[0], $F[2]);
-		$musicDB = new MusicDB();
+		$musicDB = MusicDB::connect();
 		$musicDB->UpdateQueue($D[0], "", -1, -1, $F[1], $F[2]);
 		$musicDB->close();
 	    }
@@ -368,7 +368,7 @@ class LPECClient
 		$this->getState()->setState('IdArray_Token', $D[0]);
 		$this->getState()->setState('IdArray_base64', $D[1]);
 		$this->getState()->setState('IdArray', unpack("N*", base64_decode($D[1])));
-		$musicDB = new MusicDB();
+		$musicDB = MusicDB::connect();
 		$this->CheckPlaylist($musicDB);
 		$musicDB->close();
 	    }
@@ -408,7 +408,7 @@ class LPECClient
 		if (strpos($message, "Standby ") !== false)
 		{
 		    $this->getState()->setState('Standby', $E['Standby']);
-		    $musicDB = new MusicDB();
+		    $musicDB = MusicDB::connect();
 		    $musicDB->SetState("Standby", $E['Standby']);
 		    $musicDB->close();
 		}
@@ -446,14 +446,14 @@ class LPECClient
 		if (strpos($message, "TransportState ") !== false)
 		{
 		    $this->getState()->setState('TransportState', $E['TransportState']);
-		    $musicDB = new MusicDB();
+		    $musicDB = MusicDB::connect();
 		    $musicDB->SetState("TransportState", $E['TransportState']);
 		    $musicDB->close();
 		}
 		if (strpos($message, "Id ") !== false)
 		{
 		    $this->getState()->setState('Id', $E['Id']);
-		    $musicDB = new MusicDB();
+		    $musicDB = MusicDB::connect();
 		    $musicDB->SetState("LinnId", $E['Id']);
 		    $musicDB->close();
 		}
@@ -461,7 +461,7 @@ class LPECClient
 		{
 		    $this->getState()->setState('IdArray_base64', $E['IdArray']);
 		    $this->getState()->setState('IdArray', unpack("N*", base64_decode($E['IdArray'])));
-		    $musicDB = new MusicDB();
+		    $musicDB = MusicDB::connect();
 		    $this->CheckPlaylist($musicDB);
 		    $musicDB->close();
 		}
@@ -501,14 +501,14 @@ class LPECClient
 		{
 		    LogWrite("Event Volume");
 		    $this->getState()->setState('Volume', $E['Volume']);
-		    $musicDB = new MusicDB();
+		    $musicDB = MusicDB::connect();
 		    $musicDB->SetState("Volume", $E['Volume']);
 		    $musicDB->close();
 		}
 		if (strpos($message, "Mute ") !== false)
 		{
 		    $this->getState()->setState('Mute', $E['Mute']);
-		    $musicDB = new MusicDB();
+		    $musicDB = MusicDB::connect();
 		    $musicDB->SetState("Mute", $E['Mute']);
 		    $musicDB->close();
 		}

@@ -1,11 +1,13 @@
 {
     "autoload": {
         "psr-0": {
-            "MusikServerApp": "src"
+            "MusikServerApp": "src",
+            "MusikBuild": "src"
         }
     },
     
     "require": {
-        "cboden/ratchet": "^0.3.5"
+        "cboden/ratchet": "^0.3.5",
+        "james-heinrich/getid3": "^1.9"
     }
 }

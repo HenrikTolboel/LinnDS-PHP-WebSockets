@@ -69,6 +69,10 @@ class ComposerStaticInit91cbdde8844259077df8a631631a6557
             array (
                 0 => __DIR__ . '/../..' . '/src',
             ),
+            'MusikBuild' => 
+            array (
+                0 => __DIR__ . '/../..' . '/src',
+            ),
         ),
         'G' => 
         array (
@@ -98,12 +102,19 @@ class ComposerStaticInit91cbdde8844259077df8a631631a6557
         ),
     );
 
+    public static $classMap = array (
+        'getID3' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/getid3.php',
+        'getid3_exception' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/getid3.php',
+        'getid3_handler' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/getid3.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit91cbdde8844259077df8a631631a6557::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit91cbdde8844259077df8a631631a6557::$prefixDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInit91cbdde8844259077df8a631631a6557::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit91cbdde8844259077df8a631631a6557::$classMap;
 
         }, null, ClassLoader::class);
     }

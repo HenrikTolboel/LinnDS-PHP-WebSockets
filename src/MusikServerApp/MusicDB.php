@@ -10,8 +10,6 @@
 
 namespace MusikServerApp;
 
-require_once("setup.php");
-
 define("SINGLE_TRACKS_ONLY", 0);
 define("ALBUMS_ONLY", 1);
 define("ALBUM_PRESET_ONLY", 2);
@@ -35,11 +33,48 @@ class MusicDB extends \SQLite3
     private $insertAlbumStmt = 0;
     private $insertTracksStmt = 0;
 
+    private static $DataBaseFileName = null;
+
     function __construct()
     {
-	global $DATABASE_FILENAME;
+    }
 
-	$this->open($DATABASE_FILENAME, SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
+    public static function create($DatabaseFileName)
+    {
+	$instance = new self();
+
+	self::$DataBaseFileName = $DatabaseFileName;
+
+	if (self::$DataBaseFileName === null) 
+	    die("MusicDB::create: Database file name not given!");
+
+	$instance->docreate(self::$DataBaseFileName);
+
+	return $instance;
+    }
+
+    public static function connect()
+    {
+	$instance = new self();
+
+	if (self::$DataBaseFileName === null) 
+	    die("MusicDB::connect: Database file name not given!");
+
+	$instance->doconnect(self::$DataBaseFileName);
+
+	return $instance;
+    }
+
+    protected function docreate($DataBaseFileName)
+    {
+
+	$this->open($DataBaseFileName, SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
+	$this->CreateTables();
+    }
+
+    protected function doconnect($DataBaseFileName)
+    {
+	$this->open($DataBaseFileName, SQLITE3_OPEN_READWRITE);
 	$this->CreateTables();
     }
 
@@ -146,8 +181,7 @@ class MusicDB extends \SQLite3
     function CheckURLExistStmt()
     {
 	if ($this->CheckURLExistStmt === 0)
-	    $this->CheckURLExistStmt = $this->prepare('SELECT rowid FROM Album WHERE URI == :q1 LIMIT 1');
-	    //$this->CheckURLExistStmt = $this->prepare('SELECT EXISTS(SELECT rowid FROM Album WHERE URI == :q1 LIMIT 1)');
+	    $this->CheckURLExistStmt = $this->prepare('SELECT preset FROM Album WHERE URI == :q1 LIMIT 1');
 
 	return $this->CheckURLExistStmt;
     }
@@ -155,7 +189,8 @@ class MusicDB extends \SQLite3
     function InsertAlbumStmt()
     {
 	if ($this->insertAlbumStmt === 0)
-	    $this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Key, Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Key, :Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
+	    //$this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Key, Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Key, :Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
+	    $this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Key, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Key, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
 
 	return $this->insertAlbumStmt;
     }
@@ -305,7 +340,7 @@ class MusicDB extends \SQLite3
 	//print_r($r);
 
 	if (!empty($r))
-	    $Res = $r[Preset];
+	    $Res = $r['Preset'];
 	else
 	    $Res = false;
 
@@ -318,7 +353,7 @@ class MusicDB extends \SQLite3
 	$Album, $Date, $Genre, $MusicTime, $ImageURI, $TopDirectory, $RootMenuNo)
     {
 	$this->InsertAlbumStmt()->bindParam(':Key', $Key);
-	$this->InsertAlbumStmt()->bindParam(':Preset', $Preset);
+	//$this->InsertAlbumStmt()->bindParam(':Preset', $Preset);
 	$this->InsertAlbumStmt()->bindParam(':NoTracks', $NoTracks);
 	$this->InsertAlbumStmt()->bindParam(':URI', $URI);
 	$this->InsertAlbumStmt()->bindParam(':ArtistFirst', $ArtistFirst);

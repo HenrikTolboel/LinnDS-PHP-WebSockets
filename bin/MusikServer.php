@@ -4,19 +4,24 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use MusikServerApp\ServerState;
 use MusikServerApp\LPECClient;
+use MusikServerApp\MusicDB;
 use MusikServerApp\MusicServer;
 
-require_once("src/MusikServerApp/setup.php");
-
-echo "__DIR__=" . dirname(__DIR__) . "\n";
+echo "bin/MusikServer.php: __DIR__=" . dirname(__DIR__) . "\n";
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+require_once(dirname(__DIR__) . "/src/MusikServerApp/setup.php");
 
 //SetLogFile(dirname($argv[0]) . "/logfile.txt");
 SetLogFile(dirname(__DIR__) . "/logfile.txt");
 
 LogWrite("############################## Restarted ######################################");
+
+$DATABASE_FILENAME = dirname(__DIR__) . "/LinnDS-jukebox.db";
+
+$musicDB = MusicDB::create($DATABASE_FILENAME);
+$musicDB->close();
 
 $ServerState = ServerState::getInstance();
 

@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'MusikServerApp' => array($baseDir . '/src'),
+    'MusikBuild' => array($baseDir . '/src'),
     'Guzzle\\Stream' => array($vendorDir . '/guzzle/stream'),
     'Guzzle\\Parser' => array($vendorDir . '/guzzle/parser'),
     'Guzzle\\Http' => array($vendorDir . '/guzzle/http'),

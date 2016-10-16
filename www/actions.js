@@ -36,6 +36,18 @@ $(function() {
 	conn.send(JSON.stringify(sendthis));
     };
 
+    conn.onclose = function(e) {
+	console.log("Connection closed!");
+
+	alert("Connection closed! " + e);
+    };
+
+    conn.onerror = function(e) {
+	console.log("Connection error!");
+
+	alert("Connection error! " + e);
+    };
+
     conn.onmessage = function(e) {
 	try
 	{

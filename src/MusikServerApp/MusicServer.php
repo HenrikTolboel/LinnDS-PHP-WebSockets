@@ -144,7 +144,7 @@ class MusicServer implements MessageComponentInterface {
 		if ($this->LPEC->Stop() == false)
 		    $Continue = false;
 
-		$musicDB = new MusicDB();
+		$musicDB = MusicDB::connect();
 		if ($this->LPEC->DeleteAll($musicDB) == false)
 		$Continue = false;
 		if ($this->LPEC->InsertDIDL_list($musicDB, $JukeBoxPlay, $JukeBoxTrack, 0) == false)
@@ -169,7 +169,7 @@ class MusicServer implements MessageComponentInterface {
 		if ($this->LPEC->SelectPlaylist() == false)
 		    $Continue = false;
 
-		$musicDB = new MusicDB();
+		$musicDB = MusicDB::connect();
 		if ($this->LPEC->InsertDIDL_list($musicDB, $JukeBoxPlay, $JukeBoxTrack, $this->getState()->getState('Id')) == false)
 		    $Continue = false;
 		$musicDB->close();
@@ -196,7 +196,7 @@ class MusicServer implements MessageComponentInterface {
 		if ($this->LPEC->SelectPlaylist() == false)
 		    $Continue = false;
 
-		$musicDB = new MusicDB();
+		$musicDB = MusicDB::connect();
 		if ($this->LPEC->InsertDIDL_list($musicDB, $JukeBoxPlay, $JukeBoxTrack, end($this->getState()->getState('IdArray'))) == false)
 		    $Continue = false;
 		$musicDB->close();
@@ -223,7 +223,7 @@ class MusicServer implements MessageComponentInterface {
 		if ($this->LPEC->SelectPlaylist() == false)
 		    $Continue = false;
 
-		$musicDB = new MusicDB();
+		$musicDB = MusicDB::connect();
 		if ($this->getState()->getState('TransportState') == "Stopped")
 		{
 		    if ($this->LPEC->DeleteAll($musicDB) == false)
@@ -546,7 +546,7 @@ class MusicServer implements MessageComponentInterface {
 	{
 	    //Query Album \"(\d+)\"
 	    $value = $D[0];
-	    $musicDB = new MusicDB();
+	    $musicDB = MusicDB::connect();
 	    $Res["Result"] = $musicDB->QueryAlbum($value);
 	    $musicDB->close();
 	    $from->send(json_encode($Res));
@@ -557,7 +557,7 @@ class MusicServer implements MessageComponentInterface {
 	    //Query AlbumList \"(\d+)\" \"(\d+)\"
 	    $v1 = $D[0];
 	    $v2 = $D[1];
-	    $musicDB = new MusicDB();
+	    $musicDB = MusicDB::connect();
 	    $Res["Result"] = $musicDB->QueryAlbumList($v1, $v2);
 	    $musicDB->close();
 	    $from->send(json_encode($Res));
@@ -566,7 +566,7 @@ class MusicServer implements MessageComponentInterface {
 	elseif (strpos($message, "Query Newest") !== false) 
 	{
 	    //Query Newest"
-	    $musicDB = new MusicDB();
+	    $musicDB = MusicDB::connect();
 	    $Res["Result"] = $musicDB->QueryNewest();
 	    $musicDB->close();
 	    $from->send(json_encode($Res));
@@ -576,7 +576,7 @@ class MusicServer implements MessageComponentInterface {
 	{
 	    //Query AlphabetPresent \"(\d+)\"
 	    $value = $D[0];
-	    $musicDB = new MusicDB();
+	    $musicDB = MusicDB::connect();
 	    $Res["Result"] = $musicDB->QueryAlphabetPresent($value);
 	    $musicDB->close();
 	    $from->send(json_encode($Res));
@@ -586,7 +586,7 @@ class MusicServer implements MessageComponentInterface {
 	{
 	    //Query Search \"(\d+)\"
 	    $value = $D[0];
-	    $musicDB = new MusicDB();
+	    $musicDB = MusicDB::connect();
 	    $Res["Result"] = $musicDB->QuerySearch($value);
 	    $musicDB->close();
 	    $from->send(json_encode($Res));
@@ -597,7 +597,7 @@ class MusicServer implements MessageComponentInterface {
 	    echo "Query PlayingNow...\n";
 	    //Query PlayingNow \"(\d+)\"
 	    $value = $D[0];
-	    $musicDB = new MusicDB();
+	    $musicDB = MusicDB::connect();
 	    $Res["Result"] = $musicDB->QueryPlayingNow($value);
 	    $musicDB->close();
 	    $from->send(json_encode($Res));
@@ -629,7 +629,7 @@ class MusicServer implements MessageComponentInterface {
 	if (strpos($message, "HTML Body") !== false) 
 	{
 	    //HTML Body
-	    $musicDB = new MusicDB();
+	    $musicDB = MusicDB::connect();
 	    $Res["Result"] = Body($musicDB);
 	    $musicDB->close();
 	    $from->send(json_encode($Res));
