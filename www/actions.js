@@ -37,15 +37,15 @@ $(function() {
     };
 
     conn.onclose = function(e) {
-	console.log("Connection closed!");
+	console.log("Connection closed!" . e);
 
-	alert("Connection closed! " + e);
+	alert("Connection closed! " + e + "\n Please reload the page");
     };
 
     conn.onerror = function(e) {
 	console.log("Connection error!");
 
-	alert("Connection error! " + e);
+	alert("Connection error! " + e + "\n Please reload the page");
     };
 
     conn.onmessage = function(e) {
