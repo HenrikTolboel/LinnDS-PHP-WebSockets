@@ -176,6 +176,16 @@ $(function() {
     function QueueMarkings(RevNo, LinnId) {
 	var this_li = $("#queue-"+LinnId);
 
+	if (Queue.RevNo != RevNo) {
+	    var sendthis = new Object();
+	    sendthis.Message = 'Query PlayingNow';
+	    sendthis.Context = new Object();
+	    sendthis.Context.query = 'Query PlayingNow';
+
+	    conn.send(JSON.stringify(sendthis));
+	    Queue.RevNo = RevNo;
+	    return; // We reload first, and then update
+	}
 	if (Queue.CurLinnId != LinnId) {
 	    var t;
 	    t = this_li.prevAll().attr("data-icon", "check").children();
