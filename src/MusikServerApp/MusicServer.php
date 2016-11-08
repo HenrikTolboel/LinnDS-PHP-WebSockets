@@ -238,7 +238,8 @@ class MusicServer implements MessageComponentInterface {
 		    {
 			if ($this->LPEC->InsertDIDL_list($musicDB, $RandomPreset, $RandomTrack, end($this->getState()->getState('IdArray'))) == false)
 			    $Continue = false;
-			$this->LPEC->Send("UNSUBSCRIBE Ds/Playlist");
+			if ($this->LPEC->Send("UNSUBSCRIBE Ds/Playlist") == false)
+			    $Continue = false;
 			if ($this->LPEC->Play() == false)
 			    $Continue = false;
 		    }
@@ -253,8 +254,12 @@ class MusicServer implements MessageComponentInterface {
 
 		if ($this->LPEC->Play() == false)
 		    $Continue = false;
-		$this->LPEC->Send("ACTION Ds/Playlist 1 IdArray");
-		$this->LPEC->Send("SUBSCRIBE Ds/Playlist");
+
+		if ($this->LPEC->Send("SUBSCRIBE Ds/Playlist") == false)
+		    $Continue = false;
+
+		//Not needed when just SUBSCRIBEd
+		//$this->LPEC->Send("ACTION Ds/Playlist 1 IdArray");
 
 		if ($DEBUG > 0)
 		{
