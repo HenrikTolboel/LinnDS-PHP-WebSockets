@@ -28,7 +28,7 @@ class MusicTags {
      
 	$FileInfo = $getID3->analyze($FileName);
      
-	print_r($FileInfo);
+	//print_r($FileInfo);
 
 	$this->Arr['FileFormat']        = $FileInfo['fileformat'];
 	$this->Arr['FileNamePath']      = $FileInfo['filenamepath'];

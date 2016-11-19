@@ -194,7 +194,7 @@ function Main($DoLevel)
     
     echo "Making a didl file in each directory..." . $NL;
     $DirPlaylist = new Playlist();
-    //$NumNewPlaylists = $DirPlaylist->MakePlaylists($TopDirectory);
+    $NumNewPlaylists = $DirPlaylist->MakePlaylists($TopDirectory);
     echo " - found $NumNewPlaylists new playlists" . $NL;
 
     //unlink($DATABASE_FILENAME);
