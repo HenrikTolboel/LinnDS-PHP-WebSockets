@@ -243,36 +243,14 @@ function Main($DoLevel)
     }
 
     copy("www/index.html", $AppDir . "index.html");
-    //copy("html_parts.php", $AppDir . "html_parts.php");
     copy("www/actions.js", $AppDir . "actions.js");
     copy("www/musik.css", $AppDir . "musik.css");
-    //copy("LinnDS-jukebox-daemon.php", $AppDir . "LinnDS-jukebox-daemon.php");
-    //copy("ServerState.php", $AppDir . "ServerState.php");
-    //copy("LPECClientSocket.php", $AppDir . "LPECClientSocket.php");
-    //copy("LinnDSClientSocket.php", $AppDir . "LinnDSClientSocket.php");
-    //copy("StringUtils.php", $AppDir . "StringUtils.php");
-    //copy("SocketServer.php", $AppDir . "SocketServer.php");
-    //copy("websockets.php", $AppDir . "websockets.php");
-    //copy("wsListeningSocket.php", $AppDir . "wsListeningSocket.php");
-    //copy("users.php", $AppDir . "users.php");
-//
-    ////copy("LinnDS-jukebox-daemon-old.php", $AppDir . "LinnDS-jukebox-daemon-old.php");
-    //copy("S98linn_lpec", $AppDir . "S98linn_lpec");
     copy("images/Transparent.gif", $AppDir . "Transparent.gif");
-    //copy("setup.php", $AppDir . "setup.php");
-    //copy("Send.php", $AppDir . "Send.php");
-    //copy("MusicDB.php", $AppDir . "MusicDB.php");
-    //copy("QueryAlbum.php", $AppDir . "QueryAlbum.php");
-    //copy("QueryAlbumList.php", $AppDir . "QueryAlbumList.php");
-    //copy("QueryAlphabetPresent.php", $AppDir . "QueryAlphabetPresent.php");
-    //copy("QueryDB.php", $AppDir . "QueryDB.php");
-    //copy("QueryPlayingNowDB.php", $AppDir . "QueryPlayingNowDB.php");
 
     echo $NL . "Making sprites and css file in " . $AppDir . $NL;
     Make_CSS($musicDB->MaxPreset(), $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
 
     $musicDB->close();
-    //copy($DATABASE_FILENAME, $AppDir . $DATABASE_FILENAME);
 
     echo "Finished..." . $NL;
 }
