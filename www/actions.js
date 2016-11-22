@@ -63,8 +63,29 @@ $(function() {
 		$('span.ShowVolume').each(function() {
 		    $(this).html(Vol);
 		});
-		QueueMarkings(data.Result.RevNo, data.Result.Id);
+
+		//QueueMarkings(data.Result.RevNo, data.Result.Id);
 		    
+		if (Queue.RevNo != data.Result.RevNo) {
+		    var Playlist = ParsePlaylistXMLs(data.Result.PlaylistXMLs);
+		    var MyXml = data.Result.PlaylistXMLs;
+
+		    var html = "";
+		    $.each( data.Result.IdArray, function ( i, val ) {
+			html += QueueTrackEntry2("queue", Playlist[val]);
+		    });
+		    if (html != "")
+		    {
+			$("#queue-list").html( html );
+			//$("#queue-list").listview( "refresh" );
+			
+			Queue.CurLinnId = -1; // Force marking we have new html
+		    }
+		    Queue.RevNo = data.Result.RevNo;
+		}
+
+		QueueMarkings(data.Result.RevNo, data.Result.Id);
+
 	    }
 	    else if (data.Context.query == 'Query AlphabetPresent') {
 		$("#alphabet-title").html(data.Context.title);
@@ -126,7 +147,7 @@ $(function() {
                 $(data.Context.ul).listview( "refresh" );
 //                data.Context.$ul.trigger( "updatelayout");
 	    }
-	    else if (data.Context.query == 'Query PlayingNow') {
+	    else if (data.Context.query == 'XXQuery PlayingNow') {
 		var html = "";
 		$.each( data.Result, function ( i, val ) {
 		    if (i == 0) {
@@ -140,7 +161,7 @@ $(function() {
 		    $("#queue-list").html( html );
 		    //$("#queue-list").listview( "refresh" );
 		    
-		    Queue.CurLinnId = -1; // Force mariking we have new html
+		    Queue.CurLinnId = -1; // Force marking we have new html
 		}
 
 		QueueMarkings(Queue.State.RevNo, Queue.State.LinnId);
@@ -176,13 +197,14 @@ $(function() {
     function QueueMarkings(RevNo, LinnId) {
 	var this_li = $("#queue-"+LinnId);
 
+	Queue.RevNo = RevNo; // for now we wont refresh here
 	if (Queue.RevNo != RevNo) {
-	    var sendthis = new Object();
-	    sendthis.Message = 'Query PlayingNow';
-	    sendthis.Context = new Object();
-	    sendthis.Context.query = 'Query PlayingNow';
+	    //TEST var sendthis = new Object();
+	    //TEST sendthis.Message = 'Query PlayingNow';
+	    //TEST sendthis.Context = new Object();
+	    //TEST sendthis.Context.query = 'Query PlayingNow';
 
-	    conn.send(JSON.stringify(sendthis));
+	    //TEST conn.send(JSON.stringify(sendthis));
 	    Queue.RevNo = RevNo;
 	    return; // We reload first, and then update
 	}
@@ -219,6 +241,104 @@ $(function() {
 		$.mobile.silentScroll(Queue.ScrollTop - 100);
 	    }
 	}
+    }
+
+    function ParsePlaylistXMLs(PlaylistXMLs) {
+/*
+<DIDL-Lite xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">      
+    <item id="Diana Krall+The Girl In The Other Room+2004/1" parentID="Diana Krall+The Girl In The Other Room+2004" restricted="False">        
+	    <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">Stop This World</dc:title>        
+	    <upnp:class xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">object.item.audioItem.musicTrack</upnp:class>        
+	    <res duration="3:59" protocolInfo="http-get:*:taglib/flac:*" bitrate="836768.71620492" sampleFrequency="44100" bitsPerSample="16" size="25018032">http://192.168.0.11/MusicLib/EAC/Diana%20Krall/The%20Girl%20In%20The%20Othe…20Krall+The%20Girl%20In%20The%20Other%20Room+01%20Stop%20This%20World.flac</res>        
+	    <upnp:albumArtURI xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">http://192.168.0.11/MusicLib/EAC/Diana%20Krall/The%20Girl%20In%20The%20Other%20Room/folder.jpg</upnp:albumArtURI>        
+	    <upnp:artworkURI xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">http://192.168.0.11/MusicLib/EAC/Diana%20Krall/The%20Girl%20In%20The%20Other%20Room/folder.jpg</upnp:artworkURI>        
+	    <upnp:genre xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">Jazz</upnp:genre>        
+	    <upnp:artist xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" role="Performer">Diana Krall</upnp:artist>        
+	    <upnp:artist xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" role="Composer">Unknown</upnp:artist>        
+	    <upnp:artist xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" role="AlbumArtist">Diana Krall</upnp:artist>        
+	    <upnp:artist xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" role="Conductor">Unknown</upnp:artist>        
+	    <upnp:album xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">2004/The Girl In The Other Room</upnp:album>        
+	    <upnp:originalTrackNumber xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">1</upnp:originalTrackNumber>        
+	    <dc:date xmlns:dc="http://purl.org/dc/elements/1.1/">2004</dc:date>        
+	    <upnp:originalDiscNumber xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">1</upnp:originalDiscNumber>        
+	    <upnp:originalDiscCount xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">1</upnp:originalDiscCount>      
+    </item>    
+		    
+</DIDL-Lite>
+*/
+
+	var Playlist = new Object();
+	for (var i in PlaylistXMLs) {
+	    var OneTrack = new Object();
+	    OneTrack.artist = new Object();
+	    OneTrack.LinnId = i;
+
+	    var decoded = $("<div/>").html(PlaylistXMLs[i]).text();
+	    var xmlDoc = $.parseXML(decoded);
+	    $xml = $(xmlDoc);
+	    $xml.children().each(function() {
+		var tagName=this.tagName;
+		var val=$(this).text();
+		$.each(this.attributes, function (i, attrib) {
+		    var n = attrib.name;
+		    var v = attrib.value;
+		    OneTrack[n] = v;
+		});
+		$(this).children().each(function() {
+		    var tagName=this.tagName;
+		    var val=$(this).text();
+		    $(this).children().each(function() {
+			var tagName=this.tagName;
+			var val=$(this).text();
+			if (tagName == "dc:title") {
+			    OneTrack.title = val;
+			}
+			else if (tagName == "res") {
+			    OneTrack.res = val;
+			    $.each(this.attributes, function (i, attrib) {
+				var n = attrib.name;
+				var v = attrib.value;
+				OneTrack[n] = v;
+			    });
+			}
+			else if (tagName == "upnp:albumArtURI") {
+			    OneTrack.albumArtURI = val;
+			}
+			else if (tagName == "upnp:artworkURI") {
+			    OneTrack.artworkURI = val;
+			}
+			else if (tagName == "upnp:genre") {
+			    OneTrack.genre = val;
+			}
+			else if (tagName == "upnp:artist") {
+			    var r = $(this).attr("role");
+			    OneTrack.artist[r] = val;
+			}
+			else if (tagName == "upnp:album") {
+			    OneTrack.album = val;
+			}
+			else if (tagName == "upnp:originalTrackNumber") {
+			    OneTrack.originalTrackNumber = val;
+			}
+			else if (tagName == "dc:date") {
+			    OneTrack.date = val;
+			}
+			else if (tagName == "upnp:originalDiscNumber") {
+			    OneTrack.originalDiscNumber = val;
+			}
+			else if (tagName == "upnp:originalDiscCount") {
+			    OneTrack.originalDiscCount = val;
+			}
+		    });
+		});
+	    });
+
+	    //console.log(decoded);
+	    Playlist[i] = OneTrack;
+	}
+
+	console.log(Playlist);
+	return Playlist;
     }
 
     // This one is called when clicking to open a playpopup.
@@ -412,12 +532,12 @@ $(function() {
         if (pageId==='queue') {
             console.log('beforeshow Do stuff: ' + pageId);
 
-	    var sendthis = new Object();
-	    sendthis.Message = 'Query PlayingNow';
-	    sendthis.Context = new Object();
-	    sendthis.Context.query = 'Query PlayingNow';
+	    //TEST var sendthis = new Object();
+	    //TEST sendthis.Message = 'Query PlayingNow';
+	    //TEST sendthis.Context = new Object();
+	    //TEST sendthis.Context.query = 'Query PlayingNow';
 
-	    conn.send(JSON.stringify(sendthis));
+	    //TEST conn.send(JSON.stringify(sendthis));
 
 	    console.log('beforeshow Do stuff finished: ' + pageId);
         }
@@ -636,6 +756,20 @@ $(function() {
 	html += '<p>' + values.TrackNumber + '. ' + values.Title + ' (' + values.Duration + ') ' + '</p> ';
         html += '</a>';
 	html += '<a href="#" class="showalbumclick" data-musik=' + "'" + '{"preset": "' + values.Preset + '"}' + "'" + '></a>';
+        html += '</li>';
+
+	return html;
+    }
+
+    function QueueTrackEntry2(id, values) {
+	var html = "";
+        html += '<li id ="' + id  + '-' + values.LinnId + '"' + '>';
+	html += '<a id ="' + id  + '-A-' + values.LinnId + '" href="#" class="queuepopup" data-rel="popup" data-musik=' + "'" + '{"popupid": "' + id + '-popup", "LinnId": "' +values.LinnId + '", "preset": "' + values.preset + '", "track": "' + values.trackseq + '"}' + "'" + '>';
+	html += '<img class="sprite_' + values.preset + '" src="Transparent.gif"/>';
+	html += '<h3>' + values.artist.Performer + ' - ' + values.album + '</h3>';
+	html += '<p>' + values.originalTrackNumber + '. ' + values.title + ' (' + values.duration + ') ' + '</p> ';
+        html += '</a>';
+	html += '<a href="#" class="showalbumclick" data-musik=' + "'" + '{"preset": "' + values.preset + '"}' + "'" + '></a>';
         html += '</li>';
 
 	return html;
