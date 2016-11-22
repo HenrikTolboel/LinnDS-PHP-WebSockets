@@ -10,12 +10,16 @@
 
 namespace MusikServerApp;
 
+use MusikServerApp\ServerState;
+
 define("SINGLE_TRACKS_ONLY", 0);
 define("ALBUMS_ONLY", 1);
 define("ALBUM_PRESET_ONLY", 2);
 
 class MusicDB extends \SQLite3
 {
+    protected $serverState;
+
     private $insertQueueStmt = 0;
     private $updateQueueStmt = 0;
     private $deleteQueueStmt = 0;
@@ -76,6 +80,16 @@ class MusicDB extends \SQLite3
     {
 	$this->open($DataBaseFileName, SQLITE3_OPEN_READWRITE);
 	$this->CreateTables();
+    }
+
+    public function SetServerState(ServerState $ServerState)
+    {
+	$this->serverState = $ServerState;
+    }
+    
+    private function getState()
+    {
+	return $this->serverState;
     }
 
     private function CreateTables()

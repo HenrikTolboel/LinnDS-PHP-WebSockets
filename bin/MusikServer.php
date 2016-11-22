@@ -18,12 +18,13 @@ SetLogFile(dirname(__DIR__) . "/logfile.txt");
 
 LogWrite("############################## Restarted ######################################");
 
+$ServerState = ServerState::getInstance();
+
 $DATABASE_FILENAME = dirname(__DIR__) . "/LinnDS-jukebox.db";
 
 $musicDB = MusicDB::create($DATABASE_FILENAME);
+$musicDB->SetServerState($ServerState);
 $musicDB->close();
-
-$ServerState = ServerState::getInstance();
 
 $LinnAdr = 'tcp://' . $LINN_HOST . ':' . $LINN_PORT;
 echo "Linn DS at: " . $LinnAdr . "\n";
@@ -33,8 +34,6 @@ $LPECSTREAM = stream_socket_client($LinnAdr, $errno, $errstr);
 echo "socket: $LPECSTREAM, $errno, $errstr\n";
 
 $LPEC = LPECClient::getInstance($LPECSTREAM, $ServerState, 20480);
-
-
 
 $musicServer = new MusicServer($ServerState, $LPEC);
 
