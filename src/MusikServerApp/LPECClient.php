@@ -74,9 +74,7 @@ class LPECClient
 	$this->SubscribeType['Ds/Info'] = -1;
 	$this->SubscribeType['Ds/Time'] = -1;
 
-	$musicDB = MusicDB::connect();
-	$this->IncrRevNo($musicDB);
-	$musicDB->close();
+	$this->IncrRevNo();
     }
 
     private function getState()
@@ -145,7 +143,6 @@ class LPECClient
 	    $DIDLs[0]->addAttribute("preset", $Preset);
 	    $DIDLs[0]->addAttribute("trackseq", 1);
 
-	    //TEST $musicDB->InsertQueue(-1, "ALBUMKEY", $Preset, 1, $this->PrepareXML($URLs[0][0]), $this->PrepareXML($DIDLs[0]->asXML()));
 	    if ($this->Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . $this->PrepareXML($URLs[0][0]) . "\" \"" . $this->PrepareXML($DIDLs[0]->asXML()) . "\"") === false)
 		$Res = false;
 	    if ($this->Play() === false)
@@ -156,7 +153,6 @@ class LPECClient
 		$DIDLs[$i]->addAttribute("preset", $Preset);
 		$DIDLs[$i]->addAttribute("trackseq", $i+1);
 
-		//TEST $musicDB->InsertQueue(-1, "ALBUMKEY", $Preset, $i+1, $this->PrepareXML($URLs[$i][0]), $this->PrepareXML($DIDLs[$i]->asXML()));
 		if ($this->Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . $this->PrepareXML($URLs[$i][0]) . "\" \"" . $this->PrepareXML($DIDLs[$i]->asXML()) . "\"") === false)
 		{
 		    $Res = false;
@@ -171,24 +167,21 @@ class LPECClient
 	    $DIDLs[$No]->addAttribute("trackseq", $TrackSeq);
 	    //echo  $this->PrepareXML($DIDLs[$No]->asXML()) . $NL;
 	   
-	    //TEST $musicDB->InsertQueue(-1, "ALBUMKEY", $Preset, $TrackSeq, $this->PrepareXML($URLs[$No][0]), $this->PrepareXML($DIDLs[$No]->asXML()));
 	    if ($this->Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . $this->PrepareXML($URLs[$No][0]) . "\" \"" . $this->PrepareXML($DIDLs[$No]->asXML()) . "\"") === false)
 		$Res = false;
 	    if ($this->Play() === false)
 		$Res = false;
 	}
-	$this->IncrRevNo($musicDB);
+	$this->IncrRevNo();
 	return $Res;
     }
 
-    function CheckPlaylist($musicDB)
+    function CheckPlaylist()
     {
 	$Res = true;
-	//TEST $musicDB->DeleteSequence();
 	$seq = 0;
 	foreach ($this->getState()->getState('IdArray') as $value)
 	{
-	    //TEST $musicDB->InsertSequence($seq, $value);
 	    $seq++;
 	    if ($this->getState()->getStateArray('PlaylistURLs', $value) === false)
 	    {
@@ -196,7 +189,7 @@ class LPECClient
 		    $Res = false;
 	    }
 	}
-	$this->IncrRevNo($musicDB);
+	$this->IncrRevNo();
 	return $Res;
     }
 
@@ -205,13 +198,12 @@ class LPECClient
 	$Res = true;
 	if ($this->Send("ACTION Ds/Playlist 1 DeleteAll") === false)
 	    $Res = false;
-	//TEST $musicDB->DeleteQueue();
 	$this->getState()->deleteAll();
-	$this->IncrRevNo($musicDB);
+	$this->IncrRevNo();
 	return $Res;
     }
 
-    function IncrRevNo($musicDB)
+    function IncrRevNo()
     {
 	$RevNo = $this->getState()->getState('RevNo');
 	if ($RevNo === false) 
@@ -219,7 +211,6 @@ class LPECClient
 	$RevNo = $RevNo + 1;
 	$this->getState()->setState('RevNo', $RevNo);
 	//echo "LPECClient::IncrRevNo: RevNo=$RevNo \n";
-	//TEST $musicDB->SetState('RevNo', $RevNo);
 
     }
 
@@ -353,9 +344,6 @@ class LPECClient
 
 		$this->getState()->setStateArray('PlaylistURLs', $F[0], $D[0]);
 		$this->getState()->setStateArray('PlaylistXMLs', $F[0], $D[1]);
-		//TEST $musicDB = MusicDB::connect();
-		//TEST $musicDB->UpdateQueue($F[0], "", -1, -1, $D[0], $D[1]);
-		//TEST $musicDB->close();
 	    }
 	    elseif (strpos($front, "ACTION Ds/Playlist 1 Insert ") !== false) 
 	    {
@@ -367,9 +355,6 @@ class LPECClient
 		$this->getState()->setState('NewId', $D[0]);
 		$this->getState()->setStateArray('PlaylistURLs', $D[0], $F[1]);
 		$this->getState()->setStateArray('PlaylistXMLs', $D[0], $F[2]);
-		//TEST $musicDB = MusicDB::connect();
-		//TEST $musicDB->UpdateQueue($D[0], "", -1, -1, $F[1], $F[2]);
-		//TEST $musicDB->close();
 	    }
 	    elseif (strpos($front, "ACTION Ds/Playlist 1 IdArray") !== false) 
 	    {
@@ -381,9 +366,7 @@ class LPECClient
 		$this->getState()->setState('IdArray_Token', $D[0]);
 		$this->getState()->setState('IdArray_base64', $D[1]);
 		$this->getState()->setState('IdArray', unpack("N*", base64_decode($D[1])));
-		$musicDB = MusicDB::connect();
-		$this->CheckPlaylist($musicDB);
-		$musicDB->close();
+		$this->CheckPlaylist();
 	    }
 
 	    $this->Send("");
@@ -421,9 +404,6 @@ class LPECClient
 		if (strpos($message, "Standby ") !== false)
 		{
 		    $this->getState()->setState('Standby', $E['Standby']);
-		    //TEST $musicDB = MusicDB::connect();
-		    //TEST $musicDB->SetState("Standby", $E['Standby']);
-		    //TEST $musicDB->close();
 		}
 		if (strpos($message, "ProductUrl ") !== false)
 		{
@@ -459,25 +439,17 @@ class LPECClient
 		if (strpos($message, "TransportState ") !== false)
 		{
 		    $this->getState()->setState('TransportState', $E['TransportState']);
-		    //TEST $musicDB = MusicDB::connect();
-		    //TEST $musicDB->SetState("TransportState", $E['TransportState']);
-		    //TEST $musicDB->close();
 		}
 		if (strpos($message, "Id ") !== false)
 		{
 		    $this->getState()->setState('Id', $E['Id']);
 		    $this->getState()->setState('LinnId', $E['Id']);
-		    //TEST $musicDB = MusicDB::connect();
-		    //TEST $musicDB->SetState("LinnId", $E['Id']);
-		    //TEST $musicDB->close();
 		}
 		if (strpos($message, "IdArray ") !== false)
 		{
 		    $this->getState()->setState('IdArray_base64', $E['IdArray']);
 		    $this->getState()->setState('IdArray', unpack("N*", base64_decode($E['IdArray'])));
-		    $musicDB = MusicDB::connect();
-		    $this->CheckPlaylist($musicDB);
-		    $musicDB->close();
+		    $this->CheckPlaylist();
 		}
 		if (strpos($message, "Shuffle ") !== false)
 		{
@@ -515,16 +487,10 @@ class LPECClient
 		{
 		    LogWrite("Event Volume");
 		    $this->getState()->setState('Volume', $E['Volume']);
-		    //TEST $musicDB = MusicDB::connect();
-		    //TEST $musicDB->SetState("Volume", $E['Volume']);
-		    //TEST $musicDB->close();
 		}
 		if (strpos($message, "Mute ") !== false)
 		{
 		    $this->getState()->setState('Mute', $E['Mute']);
-		    //TEST $musicDB = MusicDB::connect();
-		    //TEST $musicDB->SetState("Mute", $E['Mute']);
-		    //TEST $musicDB->close();
 		}
 		$DataHandled = 2;
 	    }
