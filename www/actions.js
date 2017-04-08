@@ -40,12 +40,14 @@ $(function() {
 	console.log("Connection closed!" . e);
 
 	alert("Connection closed! " + e + "\n Please reload the page");
+	conn = new WebSocket('ws://diskstation.local:9052');
     };
 
     conn.onerror = function(e) {
 	console.log("Connection error!");
 
 	alert("Connection error! " + e + "\n Please reload the page");
+	conn = new WebSocket('ws://diskstation.local:9052');
     };
 
     conn.onmessage = function(e) {
