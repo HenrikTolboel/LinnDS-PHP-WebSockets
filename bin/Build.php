@@ -92,7 +92,6 @@ function Make_CSS($MaxPreset, $CSS1, $CSS2)
 {
     global $NL;
     global $AppDir;
-    global $NEWEST_COUNT;
 
     $ImgSize = 80;
     $TileW = 10;
