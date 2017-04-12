@@ -87,7 +87,7 @@ class MusicDB extends \SQLite3
 	$this->serverState = $ServerState;
     }
     
-    private function getState()
+    private function XXXgetState()
     {
 	return $this->serverState;
     }
@@ -107,9 +107,9 @@ class MusicDB extends \SQLite3
 	$this->exec('CREATE TABLE IF NOT EXISTS Album (Key STRING, Preset INTEGER PRIMARY KEY ASC, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
 
 	// Tables used in LinnDS-jukebox-daemon.php
-	$this->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, AlbumKey STRING, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
-	$this->exec('CREATE TABLE IF NOT EXISTS State (Id STRING, Value STRING)');
-	$this->exec('CREATE TABLE IF NOT EXISTS Sequence (Seq INTEGER, LinnId INTEGER)');
+	//$this->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, AlbumKey STRING, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
+	//$this->exec('CREATE TABLE IF NOT EXISTS State (Id STRING, Value STRING)');
+	//$this->exec('CREATE TABLE IF NOT EXISTS Sequence (Seq INTEGER, LinnId INTEGER)');
 
 
 	// Create indexes
@@ -120,7 +120,7 @@ class MusicDB extends \SQLite3
 	$this->exec('CREATE INDEX IF NOT EXISTS Tracks_idx2 ON Tracks (Preset, TrackSeq)');
     }
 
-    function InsertQueueStmt()
+    function XXXInsertQueueStmt()
     {
 	if ($this->insertQueueStmt === 0)
 	    $this->insertQueueStmt = $this->prepare('INSERT INTO Queue (LinnId, AlbumKey, Preset, TrackSeq, URL, XML) VALUES (:LinnId, :AlbumKey, :Preset, :TrackSeq, :URL, :XML)');
@@ -128,7 +128,7 @@ class MusicDB extends \SQLite3
 	return $this->insertQueueStmt;
     }
 
-    function UpdateQueueStmt()
+    function XXXUpdateQueueStmt()
     {
 	if ($this->updateQueueStmt === 0)
 	    $this->updateQueueStmt = $this->prepare('UPDATE Queue set LinnId = :LinnId where (LinnId == :LinnId) OR (LinnId == -1 and URL == :URL)');
@@ -136,7 +136,7 @@ class MusicDB extends \SQLite3
 	return $this->updateQueueStmt;
     }
 
-    function DeleteQueueStmt()
+    function XXXDeleteQueueStmt()
     {
 	if ($this->deleteQueueStmt === 0)
 	    $this->deleteQueueStmt = $this->prepare('DELETE FROM Queue');
@@ -145,14 +145,14 @@ class MusicDB extends \SQLite3
     }
 
 
-    function InsertStateStmt()
+    function XXXInsertStateStmt()
     {
 	if ($this->insertStateStmt === 0)
 	    $this->insertStateStmt = $this->prepare('INSERT INTO State (Id, Value) VALUES (:Id, :Value)');
 	return $this->insertStateStmt;
     }
 
-    function UpdateStateStmt()
+    function XXXUpdateStateStmt()
     {
 	if ($this->updateStateStmt === 0)
 	    $this->updateStateStmt = $this->prepare('UPDATE State set Value = :Value WHERE Id = :Id');
@@ -160,7 +160,7 @@ class MusicDB extends \SQLite3
 	return $this->updateStateStmt;
     }
 
-    function InsertSequenceStmt()
+    function XXXInsertSequenceStmt()
     {
 	if ($this->insertSequenceStmt === 0)
 	    $this->insertSequenceStmt = $this->prepare('INSERT INTO Sequence (Seq, LinnId) VALUES (:Seq, :LinnId)');
@@ -168,7 +168,7 @@ class MusicDB extends \SQLite3
 	return $this->insertSequenceStmt;
     }
 
-    function DeleteSequenceStmt()
+    function XXXDeleteSequenceStmt()
     {
 	if ($this->deleteSequenceStmt === 0)
 	    $this->deleteSequenceStmt = $this->prepare('DELETE FROM Sequence');
@@ -217,7 +217,7 @@ class MusicDB extends \SQLite3
 	return $this->insertTracksStmt;
     }
 
-    public function InsertQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML)
+    public function XXXInsertQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML)
     {
 	$this->InsertQueueStmt()->bindParam(':LinnId', $LinnId);
 	$this->InsertQueueStmt()->bindParam(':AlbumKey', $AlbumKey);
@@ -233,7 +233,7 @@ class MusicDB extends \SQLite3
 	$this->InsertQueueStmt()->reset();
     }
 
-    public function UpdateQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML)
+    public function XXXUpdateQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML)
     {
 	$this->UpdateQueueStmt()->bindParam(':LinnId', $LinnId);
 	$this->UpdateQueueStmt()->bindParam(':URL', $URL);
@@ -250,7 +250,7 @@ class MusicDB extends \SQLite3
 	$this->UpdateQueueStmt()->reset();
     }
 
-    public function DeleteQueue()
+    public function XXXDeleteQueue()
     {
 	$result = $this->DeleteQueueStmt()->execute();
 
@@ -260,7 +260,7 @@ class MusicDB extends \SQLite3
 	$this->DeleteQueueStmt()->reset();
     }
 
-    public function SetState($Id, $Value)
+    public function XXXSetState($Id, $Value)
     {
 	$this->UpdateStateStmt()->bindParam(':Id', $Id);
 	$this->UpdateStateStmt()->bindParam(':Value', $Value);
@@ -284,7 +284,7 @@ class MusicDB extends \SQLite3
 	$this->UpdateStateStmt()->reset();
     }
 
-    public function InsertSequence($Seq, $LinnId)
+    public function XXXInsertSequence($Seq, $LinnId)
     {
 	$this->InsertSequenceStmt()->bindParam(':Seq', $Seq);
 	$this->InsertSequenceStmt()->bindParam(':LinnId', $LinnId);
@@ -296,7 +296,7 @@ class MusicDB extends \SQLite3
 	$this->InsertSequenceStmt()->reset();
     }
 
-    public function DeleteSequence()
+    public function XXXDeleteSequence()
     {
 	$result = $this->DeleteSequenceStmt()->execute();
 
