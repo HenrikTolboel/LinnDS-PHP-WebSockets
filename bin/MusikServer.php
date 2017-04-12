@@ -23,7 +23,7 @@ $ServerState = ServerState::getInstance();
 $DATABASE_FILENAME = dirname(__DIR__) . "/LinnDS-jukebox.db";
 
 $musicDB = MusicDB::create($DATABASE_FILENAME);
-$musicDB->SetServerState($ServerState);
+//$musicDB->SetServerState($ServerState);
 $musicDB->close();
 
 $LinnAdr = 'tcp://' . $LINN_HOST . ':' . $LINN_PORT;

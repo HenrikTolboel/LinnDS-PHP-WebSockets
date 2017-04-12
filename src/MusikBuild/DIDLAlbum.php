@@ -47,16 +47,6 @@ class DIDLAlbum
 	return $this->Value['Art'];
     }
 
-    public function setSequenceNo($No)
-    {
-	$this->Value['SequenceNo'] = $No;
-    }
-
-    public function SequenceNo()
-    {
-	return $this->Value['SequenceNo'];
-    }
-
     public function TopDirectory()
     {
 	return $this->Value['Path'][1];

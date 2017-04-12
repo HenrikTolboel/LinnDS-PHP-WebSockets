@@ -149,25 +149,6 @@ $(function() {
                 $(data.Context.ul).listview( "refresh" );
 //                data.Context.$ul.trigger( "updatelayout");
 	    }
-	    else if (data.Context.query == 'XXQuery PlayingNow') {
-		var html = "";
-		$.each( data.Result, function ( i, val ) {
-		    if (i == 0) {
-			Queue.State = val;
-		    } else {
-			html += QueueTrackEntry("queue", val);
-		    }
-		});
-		if (html != "")
-		{
-		    $("#queue-list").html( html );
-		    //$("#queue-list").listview( "refresh" );
-		    
-		    Queue.CurLinnId = -1; // Force marking we have new html
-		}
-
-		QueueMarkings(Queue.State.RevNo, Queue.State.LinnId);
-	    }
 	    else if (data.Context.query == 'HTML Body') {
 		var bd = $('body');
 		bd.html(data.Result);
@@ -201,12 +182,6 @@ $(function() {
 
 	Queue.RevNo = RevNo; // for now we wont refresh here
 	if (Queue.RevNo != RevNo) {
-	    //TEST var sendthis = new Object();
-	    //TEST sendthis.Message = 'Query PlayingNow';
-	    //TEST sendthis.Context = new Object();
-	    //TEST sendthis.Context.query = 'Query PlayingNow';
-
-	    //TEST conn.send(JSON.stringify(sendthis));
 	    Queue.RevNo = RevNo;
 	    return; // We reload first, and then update
 	}
@@ -534,13 +509,6 @@ $(function() {
         if (pageId==='queue') {
             console.log('beforeshow Do stuff: ' + pageId);
 
-	    //TEST var sendthis = new Object();
-	    //TEST sendthis.Message = 'Query PlayingNow';
-	    //TEST sendthis.Context = new Object();
-	    //TEST sendthis.Context.query = 'Query PlayingNow';
-
-	    //TEST conn.send(JSON.stringify(sendthis));
-
 	    console.log('beforeshow Do stuff finished: ' + pageId);
         }
     });
@@ -697,7 +665,8 @@ $(function() {
 
         html += '<li>';
 	html += '<a id="' + id + '-' + preset + '" class="playpopup" data-rel="popup" href="#" data-musik=' + "'" + '{"popupid": "' + id + '-popup", "preset": "' + preset + '"}' + "'" + '>';
-	html += '<img class="sprite_' + preset + '" src="Transparent.gif"/>';
+	//html += '<img class="sprite_' + preset + '" src="Transparent.gif"/>';
+	html += '<img class="preset_' + preset + '" src="Transparent.gif"/>';
 
 	html += '<h3>';
 
@@ -753,7 +722,8 @@ $(function() {
 	Queue.Sequence[values.Seq] = values.LinnId;
         html += '<li id ="' + id  + '-' + values.LinnId + '"' + '>';
 	html += '<a id ="' + id  + '-A-' + values.LinnId + '" href="#" class="queuepopup" data-rel="popup" data-musik=' + "'" + '{"popupid": "' + id + '-popup", "LinnId": "' +values.LinnId + '", "preset": "' + values.Preset + '", "track": "' + values.TrackSeq + '"}' + "'" + '>';
-	html += '<img class="sprite_' + values.Preset + '" src="Transparent.gif"/>';
+	//html += '<img class="sprite_' + values.Preset + '" src="Transparent.gif"/>';
+	html += '<img class="preset_' + values.Preset + '" src="Transparent.gif"/>';
 	html += '<h3>' + values.ArtistPerformer + ' - ' + values.Album + '</h3>';
 	html += '<p>' + values.TrackNumber + '. ' + values.Title + ' (' + values.Duration + ') ' + '</p> ';
         html += '</a>';
@@ -767,7 +737,8 @@ $(function() {
 	var html = "";
         html += '<li id ="' + id  + '-' + values.LinnId + '"' + '>';
 	html += '<a id ="' + id  + '-A-' + values.LinnId + '" href="#" class="queuepopup" data-rel="popup" data-musik=' + "'" + '{"popupid": "' + id + '-popup", "LinnId": "' +values.LinnId + '", "preset": "' + values.preset + '", "track": "' + values.trackseq + '"}' + "'" + '>';
-	html += '<img class="sprite_' + values.preset + '" src="Transparent.gif"/>';
+	//html += '<img class="sprite_' + values.preset + '" src="Transparent.gif"/>';
+	html += '<img class="preset_' + values.preset + '" src="Transparent.gif"/>';
 	html += '<h3>' + values.artist.Performer + ' - ' + values.album + '</h3>';
 	html += '<p>' + values.originalTrackNumber + '. ' + values.title + ' (' + values.duration + ') ' + '</p> ';
         html += '</a>';
@@ -783,7 +754,8 @@ $(function() {
 
         html += '<li data-filtertext="' + filtertext + '">';
 	html += '<a id="' + id + '-' + preset + '" class="playpopup" data-rel="popup" href="#" data-musik=' + "'" + '{"popupid": "' + id + '-popup", "preset": "' + preset + '"}' + "'" + '>';
-	html += '<img class="sprite_' + preset + '" src="Transparent.gif"/>';
+	//html += '<img class="sprite_' + preset + '" src="Transparent.gif"/>';
+	html += '<img class="preset_' + preset + '" src="Transparent.gif"/>';
 
 	html += '<h3>';
 
@@ -814,7 +786,8 @@ $(function() {
 	var html = "";
         html += '<li data-filtertext="' + filtertext + '">';
 	html += '<a id ="' + id  + '-' + preset + '-' + trackseq + '" href="#" class="playpopup" data-rel="popup" data-musik=' + "'" + '{"popupid": "' + id + '-popup", "preset": "' + preset + '", "track": "' + trackseq + '"}' + "'" + '>';
-	html += '<img class="sprite_' + preset + '" src="Transparent.gif"/>';
+	//html += '<img class="sprite_' + preset + '" src="Transparent.gif"/>';
+	html += '<img class="preset_' + preset + '" src="Transparent.gif"/>';
 	html += '<h3>' + values.ArtistPerformer + ' - ' + values.Album + '</h3>';
 	html += '<h3>' + values.TrackNumber + '. ' + values.Title + '</h3> ';
 	html += '<p>' + values.Duration + '</p>';

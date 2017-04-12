@@ -601,17 +601,6 @@ class MusicServer implements MessageComponentInterface {
 	    $from->send(json_encode($Res));
 	    $DataHandled = true;
 	}
-	elseif (strpos($message, "Query PlayingNow") !== false) 
-	{
-	    echo "Query PlayingNow...\n";
-	    //Query PlayingNow \"(\d+)\"
-	    $value = $D[0];
-	    $musicDB = MusicDB::connect();
-	    $Res["Result"] = $musicDB->QueryPlayingNow($value);
-	    $musicDB->close();
-	    $from->send(json_encode($Res));
-	    $DataHandled = true;
-	}
 
 	return $DataHandled;
     }

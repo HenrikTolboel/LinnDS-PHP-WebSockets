@@ -3,7 +3,7 @@
 /*!
 * LinnDS-jukebox
 *
-* Copyright (c) 2012-2016 Henrik Tolbøl, http://tolbøl.dk
+* Copyright (c) 2012-2017 Henrik Tolbøl, http://tolbøl.dk
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
@@ -23,50 +23,38 @@ require_once(dirname(__DIR__) . "/src/MusikBuild/tracks.php");
 require_once(dirname(__DIR__) . "/src/MusikBuild/FileUtils.php");
 
 
-function Make_Tracks(&$didl, &$musicDB)
+function Make_Tracks(&$didl, &$musicDB, $preset)
 {
-    return Tracks($musicDB, AbsoluteBuildPath($didl->PlaylistFileName()), $didl->Key(), $didl->SequenceNo());
+    return Tracks($musicDB, AbsoluteBuildPath($didl->PlaylistFileName()), $didl->Key(), $preset);
 }
 
 
 function Make_Album(&$didl, &$musicDB)
 {
+    // Preset (-47) is not stored, it is the automatic rowid in table.
     $rowid = $musicDB->InsertAlbum($didl->Key(), -47, $didl->NoTracks(), $didl->URI(), 
 		    $didl->ArtistFirst(), $didl->Artist(), $didl->SortArtist(), 
 		    $didl->Album(), $didl->Date(), $didl->Genre(), $didl->MusicTime(), 
 		    $didl->ImageURI(), $didl->TopDirectory(), $didl->RootMenuNo());
 
-    $didl->setSequenceNo($rowid);
+    // rowid == PresetNo is returned to be able to have foreign key from
+    // Tracks.
     return $rowid;
 }
 
-function CreateAllGreyImgs($MaxPreset)
-{
-    global $AppDir;
-
-    for ($i = 1; $i <= $MaxPreset; $i++)
-    {
-	$newfile = sprintf($AppDir . "folder/80x80_%04d.jpg", $i);
-	copy("images/grey.jpg", $newfile);
-
-	$newfile = sprintf($AppDir . "folder/160x160_%04d.jpg", $i);
-	copy("images/grey.jpg", $newfile);
-    }
-}
-
-function CollectFolderImgs(&$didl)
+function PrepareFolderImage($ImageFileName, $SpriteNo)
 {
     global $NL;
     global $AppDir;
 
-    $img = AbsoluteBuildPath($didl->ImageFileName());
+    $img = AbsoluteBuildPath($ImageFileName);
     
     if (strlen($img) <= 4 || !file_exists($img))
     {
-	$newfile = sprintf($AppDir . "folder/80x80_%04d.jpg", $didl->SequenceNo());
+	$newfile = sprintf($AppDir . "folder/80x80_%04d.jpg", $SpriteNo);
 	copy("images/grey.jpg", $newfile);
 
-	$newfile = sprintf($AppDir . "folder/160x160_%04d.jpg", $didl->SequenceNo());
+	$newfile = sprintf($AppDir . "folder/160x160_%04d.jpg", $SpriteNo);
 	copy("images/grey.jpg", $newfile);
 	return;
     }
@@ -82,17 +70,18 @@ function CollectFolderImgs(&$didl)
 	echo $NL . $cmd . $NL;
 	shell_exec($cmd);
     }
-    $newfile = sprintf($AppDir . "folder/80x80_%04d.jpg", $didl->SequenceNo());
+    $newfile = sprintf($AppDir . "folder/80x80_%04d.jpg", $SpriteNo);
     copy(dirname($img) . "/80x80.jpg", $newfile);
-    $newfile = sprintf($AppDir . "folder/160x160_%04d.jpg", $didl->SequenceNo());
+    $newfile = sprintf($AppDir . "folder/160x160_%04d.jpg", $SpriteNo);
     copy(dirname($img) . "/160x160.jpg", $newfile);
 }
 
-function Make_CSS($MaxPreset, $CSS1, $CSS2)
+function Make_CSS(&$Sprites, $CSS1, $CSS2)
 {
     global $NL;
     global $AppDir;
 
+    $AlbumCnt = count($Sprites);
     $ImgSize = 80;
     $TileW = 10;
     $TileH = 10;
@@ -113,16 +102,16 @@ function Make_CSS($MaxPreset, $CSS1, $CSS2)
 
     $css = "";
     $cnt = 0;
-    for ($k = 0; $cnt < $MaxPreset; $k++)
+    for ($k = 0; $cnt < $AlbumCnt; $k++)
     {
-	for ($i = 0; $i < $TileW && $cnt < $MaxPreset; $i++)
+	for ($i = 0; $i < $TileW && $cnt < $AlbumCnt; $i++)
 	{
-	    for ($j = 0; $j < $TileH && $cnt < $MaxPreset; $j++)
+	    for ($j = 0; $j < $TileH && $cnt < $AlbumCnt; $j++)
 	    {
 		$cnt++;
 		$posx = -1 * ($i * $ImgSize + $i*2 +1);
 		$posy = -1 * ($j * $ImgSize + $j*2 +1);
-		$css .= ".sprite_" . $cnt . $NL;
+		$css .= ".sprite_" . $cnt . ", .preset_" . $Sprites[$cnt-1]['Preset'] . $NL;
 		$css .= "{\n";
 		$css .= "   width: " . $ImgSize . "px;\n";
 		$css .= "   height: " . $ImgSize . "px;\n";
@@ -137,16 +126,16 @@ function Make_CSS($MaxPreset, $CSS1, $CSS2)
 
     $css = "";
     $cnt = 0;
-    for ($k = 0; $cnt < $MaxPreset; $k++)
+    for ($k = 0; $cnt < $AlbumCnt; $k++)
     {
-	for ($i = 0; $i < $TileW && $cnt < $MaxPreset; $i++)
+	for ($i = 0; $i < $TileW && $cnt < $AlbumCnt; $i++)
 	{
-	    for ($j = 0; $j < $TileH && $cnt < $MaxPreset; $j++)
+	    for ($j = 0; $j < $TileH && $cnt < $AlbumCnt; $j++)
 	    {
 		$cnt++;
 		$posx = -1 * ($i * $ImgSize + $i*2 +1);
 		$posy = -1 * ($j * $ImgSize + $j*2 +1);
-		$css .= ".sprite_" . $cnt . $NL;
+		$css .= ".sprite_" . $cnt . ", .preset_" . $Sprites[$cnt-1]['Preset'] . $NL;
 		$css .= "{\n";
 		$css .= "   width: " . $ImgSize . "px;\n";
 		$css .= "   height: " . $ImgSize . "px;\n";
@@ -193,61 +182,75 @@ function Main($DoLevel)
     
     echo "Making a didl file in each directory..." . $NL;
     $DirPlaylist = new Playlist();
-    $NumNewPlaylists = $DirPlaylist->MakePlaylists($TopDirectory);
+    if (1)
+	$NumNewPlaylists = $DirPlaylist->MakePlaylists($TopDirectory);
     echo " - found $NumNewPlaylists new playlists" . $NL;
 
     //unlink($DATABASE_FILENAME);
     $musicDB = MusicDB::create($DATABASE_FILENAME);
 
-    echo "Find all didl files and add to Menu tree..." . $NL;
-    // Find all didl files and add it to the menus
-    try
+    if (1)
     {
-	//CreateAllGreyImgs($musicDB->MaxPreset());
-	foreach ($TopDirectory as $Dir => $RootMenuNo)
+	echo "Find all didl files and add to Menu tree..." . $NL;
+	// Find all didl files and add it to the menus
+	try
 	{
-	    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($Dir));
-	    while($it->valid())
+	    foreach ($TopDirectory as $Dir => $RootMenuNo)
 	    {
-		if($it->isFile())
+		$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($Dir));
+		while($it->valid())
 		{
-		    $ext = pathinfo($it->current(), PATHINFO_EXTENSION);
-
-		    if ($ext == "xml")
+		    if($it->isFile())
 		    {
-			$didl = new DIDLAlbum($it->getPathName(), $RootMenuNo);
-			$rowid = $musicDB->CheckURLExist($didl->URI());
-			if ($rowid === false)
-			{
-			    $rowid = Make_Album($didl, $musicDB);
-			    Make_Tracks($didl, $musicDB);
-			    //$didl->dump();
-			}
-			else
-			{
-			    $didl->setSequenceNo($rowid);
-			}
+			$ext = pathinfo($it->current(), PATHINFO_EXTENSION);
 
-			CollectFolderImgs($didl);
-			echo ".";
+			if ($ext == "xml")
+			{
+			    $didl = new DIDLAlbum($it->getPathName(), $RootMenuNo);
+			    $rowid = $musicDB->CheckURLExist($didl->URI());
+			    if ($rowid === false)
+			    {
+				$rowid = Make_Album($didl, $musicDB);
+				Make_Tracks($didl, $musicDB, $rowid); // rowid == preset
+				//$didl->dump();
+			    }
+
+			    echo ".";
+			}
 		    }
+		    $it->next();
 		}
-		$it->next();
 	    }
 	}
+	catch(Exception $e)
+	{
+	    echo $e->getMessage();
+	}
     }
-    catch(Exception $e)
+
+    $musicDB->CreateNewSpritesTable();
+    $Sprites = $musicDB->QuerySprites();
+
+    //print_r($Sprites[7]);
+
+    if (1)
     {
-	echo $e->getMessage();
+	echo "Collect all thumb images in folder and make fortrunning file name $NL";
+	foreach ($Sprites as $item)
+	{
+	    PrepareFolderImage($item['ImageURI'], $item['rowid']);
+	}
+
+	copy("www/index.html", $AppDir . "index.html");
+	copy("www/actions.js", $AppDir . "actions.js");
+	copy("www/musik.css", $AppDir . "musik.css");
+	copy("images/Transparent.gif", $AppDir . "Transparent.gif");
+
+	echo $NL . "Making sprites and css file in " . $AppDir . $NL;
+	array_map('unlink', glob("$AppDir/sprites/*.jpg"));
+	Make_CSS($Sprites, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
+	array_map('unlink', glob("$AppDir/folder/*.jpg"));
     }
-
-    copy("www/index.html", $AppDir . "index.html");
-    copy("www/actions.js", $AppDir . "actions.js");
-    copy("www/musik.css", $AppDir . "musik.css");
-    copy("images/Transparent.gif", $AppDir . "Transparent.gif");
-
-    echo $NL . "Making sprites and css file in " . $AppDir . $NL;
-    Make_CSS($musicDB->MaxPreset(), $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
 
     $musicDB->close();
 

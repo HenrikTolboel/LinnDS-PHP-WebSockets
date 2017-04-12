@@ -82,16 +82,6 @@ class MusicDB extends \SQLite3
 	$this->CreateTables();
     }
 
-    public function SetServerState(ServerState $ServerState)
-    {
-	$this->serverState = $ServerState;
-    }
-    
-    private function XXXgetState()
-    {
-	return $this->serverState;
-    }
-
     private function CreateTables()
     {
 	static $TablesChecked = 0;
@@ -106,11 +96,6 @@ class MusicDB extends \SQLite3
 	// Preset is an alias of the rowid field in the Album table.
 	$this->exec('CREATE TABLE IF NOT EXISTS Album (Key STRING, Preset INTEGER PRIMARY KEY ASC, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
 
-	// Tables used in LinnDS-jukebox-daemon.php
-	//$this->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, AlbumKey STRING, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
-	//$this->exec('CREATE TABLE IF NOT EXISTS State (Id STRING, Value STRING)');
-	//$this->exec('CREATE TABLE IF NOT EXISTS Sequence (Seq INTEGER, LinnId INTEGER)');
-
 
 	// Create indexes
 	$this->exec('CREATE INDEX IF NOT EXISTS Album_idx1 ON Album (Key)');
@@ -120,61 +105,41 @@ class MusicDB extends \SQLite3
 	$this->exec('CREATE INDEX IF NOT EXISTS Tracks_idx2 ON Tracks (Preset, TrackSeq)');
     }
 
-    function XXXInsertQueueStmt()
-    {
-	if ($this->insertQueueStmt === 0)
-	    $this->insertQueueStmt = $this->prepare('INSERT INTO Queue (LinnId, AlbumKey, Preset, TrackSeq, URL, XML) VALUES (:LinnId, :AlbumKey, :Preset, :TrackSeq, :URL, :XML)');
 
-	return $this->insertQueueStmt;
+    public function CreateNewSpritesTable()
+    {
+	$this->exec('DROP TABLE IF EXISTS Sprites');
+	$this->exec('CREATE TABLE Sprites (Preset INTEGER)');
+
+	$Stmt = $this->prepare('INSERT INTO Sprites SELECT Preset FROM Album ORDER BY RootMenuNo, ArtistFirst, SortArtist, Album');
+	$result = $Stmt->execute();
+
+	$Stmt->close();
     }
 
-    function XXXUpdateQueueStmt()
+    public function QuerySprites()
     {
-	if ($this->updateQueueStmt === 0)
-	    $this->updateQueueStmt = $this->prepare('UPDATE Queue set LinnId = :LinnId where (LinnId == :LinnId) OR (LinnId == -1 and URL == :URL)');
+	$SelStmt = "SELECT Album.Preset, Sprites.RowId, Album.ImageURI FROM Album, Sprites WHERE Album.Preset = Sprites.Preset";
 
-	return $this->updateQueueStmt;
+	$Stmt = $this->prepare($SelStmt);
+
+	$result = $Stmt->execute();
+
+	$R = array();
+	$i = 0;
+	// fetchArray(SQLITE3_NUM | SQLITE_ASSOC | SQLITE_BOTH) - default both
+	while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+	    $R[$i] = $row;
+	    $i++;
+	}
+
+	$Stmt->close();
+
+	//print_r($R);
+	return $R;
+	//return json_encode($R);
     }
 
-    function XXXDeleteQueueStmt()
-    {
-	if ($this->deleteQueueStmt === 0)
-	    $this->deleteQueueStmt = $this->prepare('DELETE FROM Queue');
-
-	return $this->deleteQueueStmt;
-    }
-
-
-    function XXXInsertStateStmt()
-    {
-	if ($this->insertStateStmt === 0)
-	    $this->insertStateStmt = $this->prepare('INSERT INTO State (Id, Value) VALUES (:Id, :Value)');
-	return $this->insertStateStmt;
-    }
-
-    function XXXUpdateStateStmt()
-    {
-	if ($this->updateStateStmt === 0)
-	    $this->updateStateStmt = $this->prepare('UPDATE State set Value = :Value WHERE Id = :Id');
-
-	return $this->updateStateStmt;
-    }
-
-    function XXXInsertSequenceStmt()
-    {
-	if ($this->insertSequenceStmt === 0)
-	    $this->insertSequenceStmt = $this->prepare('INSERT INTO Sequence (Seq, LinnId) VALUES (:Seq, :LinnId)');
-
-	return $this->insertSequenceStmt;
-    }
-
-    function XXXDeleteSequenceStmt()
-    {
-	if ($this->deleteSequenceStmt === 0)
-	    $this->deleteSequenceStmt = $this->prepare('DELETE FROM Sequence');
-
-	return $this->deleteSequenceStmt;
-    }
 
     function NumberOfTracksStmt()
     {
@@ -203,7 +168,6 @@ class MusicDB extends \SQLite3
     function InsertAlbumStmt()
     {
 	if ($this->insertAlbumStmt === 0)
-	    //$this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Key, Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Key, :Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
 	    $this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Key, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Key, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
 
 	return $this->insertAlbumStmt;
@@ -215,95 +179,6 @@ class MusicDB extends \SQLite3
 	    $this->insertTracksStmt = $this->prepare('INSERT INTO Tracks (AlbumKey, Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount, BitRate, SampleFrequency, BitsPerSample, Size) VALUES  (:AlbumKey, :Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount, :BitRate, :SampleFrequency, :BitsPerSample, :Size)');
 
 	return $this->insertTracksStmt;
-    }
-
-    public function XXXInsertQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML)
-    {
-	$this->InsertQueueStmt()->bindParam(':LinnId', $LinnId);
-	$this->InsertQueueStmt()->bindParam(':AlbumKey', $AlbumKey);
-	$this->InsertQueueStmt()->bindParam(':Preset', $Preset);
-	$this->InsertQueueStmt()->bindParam(':TrackSeq', $TrackSeq);
-	$this->InsertQueueStmt()->bindParam(':URL', $URL);
-	$this->InsertQueueStmt()->bindParam(':XML', $XML);
-
-	$result = $this->InsertQueueStmt()->execute();
-
-	$r = $this->changes();
-	LogWrite("InsertQueue: $LinnId, $AlbumKey, $Preset, $TrackSeq, $URL -> $r");
-	$this->InsertQueueStmt()->reset();
-    }
-
-    public function XXXUpdateQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML)
-    {
-	$this->UpdateQueueStmt()->bindParam(':LinnId', $LinnId);
-	$this->UpdateQueueStmt()->bindParam(':URL', $URL);
-
-	$result = $this->UpdateQueueStmt()->execute();
-
-	$r = $this->changes();
-	LogWrite("UpdateQueue: $LinnId, $AlbumKey, $Preset, $TrackSeq, $URL -> $r");
-	if ($this->changes() < 1)
-	{
-	    $this->InsertQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML);
-	}
-
-	$this->UpdateQueueStmt()->reset();
-    }
-
-    public function XXXDeleteQueue()
-    {
-	$result = $this->DeleteQueueStmt()->execute();
-
-	$r = $this->changes();
-	LogWrite("DeleteQueue: -> $r");
-
-	$this->DeleteQueueStmt()->reset();
-    }
-
-    public function XXXSetState($Id, $Value)
-    {
-	$this->UpdateStateStmt()->bindParam(':Id', $Id);
-	$this->UpdateStateStmt()->bindParam(':Value', $Value);
-
-	$result = $this->UpdateStateStmt()->execute();
-
-	$r = $this->changes();
-	LogWrite("SetState: $Id, $Value -> $r");
-	if ($this->changes() < 1)
-	{
-	    $this->InsertStateStmt()->bindParam(':Id', $Id);
-	    $this->InsertStateStmt()->bindParam(':Value', $Value);
-
-	    $result = $this->InsertStateStmt()->execute();
-
-	    $r = $this->changes();
-	    LogWrite("SetState-Insert: $Id, $Value -> $r");
-	    $this->InsertStateStmt()->reset();
-	}
-
-	$this->UpdateStateStmt()->reset();
-    }
-
-    public function XXXInsertSequence($Seq, $LinnId)
-    {
-	$this->InsertSequenceStmt()->bindParam(':Seq', $Seq);
-	$this->InsertSequenceStmt()->bindParam(':LinnId', $LinnId);
-
-	$result = $this->InsertSequenceStmt()->execute();
-
-	$r = $this->changes();
-	LogWrite("InsertSequence: $Seq, $LinnId -> $r");
-	$this->InsertSequenceStmt()->reset();
-    }
-
-    public function XXXDeleteSequence()
-    {
-	$result = $this->DeleteSequenceStmt()->execute();
-
-	$r = $this->changes();
-	LogWrite("DeleteSequence: -> $r");
-
-	$this->DeleteSequenceStmt()->reset();
     }
 
     public function NumberOfTracks($Preset)
@@ -670,57 +545,6 @@ class MusicDB extends \SQLite3
 	//print_r($R);
 	return $R;
 	//return json_encode($R);
-    }
-
-    public function QueryPlayingNow($revno)
-    {
-	$Queue = array();
-	$Queue[0] = array();
-
-	$Stmt = $this->prepare("SELECT MAX(Seq) As MaxSeq, MAX(LinnId) AS MaxLinnId FROM Sequence");
-	$result = $Stmt->execute();
-
-	while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
-	{
-	    $Queue[0]['MaxSeq'] = $row['MaxSeq'];
-	    $Queue[0]['MaxLinnId'] = $row['MaxLinnId'];
-	}
-	$Stmt->close();
-
-	$Stmt = $this->prepare("SELECT * FROM State");
-	$result = $Stmt->execute();
-
-	while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
-	{
-	    $Queue[0][$row['Id']] = $row['Value'];
-	}
-	$Stmt->close();
-
-	if ($revno == -1 || $Queue[0]['RevNo'] != $revno)
-	{
-	    $QueueStmt = $this->prepare("SELECT S.Seq-L.Seq AS PlayState, Q.LinnId AS LinnId, S.Seq AS Seq, T.* FROM Queue Q, Sequence S, Tracks T, (SELECT S2.Seq FROM Sequence S2, (SELECT ST.value FROM State ST where ST.Id == 'LinnId') L2 WHERE S2.LinnId == L2.value) L WHERE Q.LinnId == S.LinnId AND Q.Preset == T.Preset AND Q.TrackSeq == T.TrackSeq ORDER BY S.Seq");
-
-
-	    $result = $QueueStmt->execute();
-
-	    $QueueCount = 1;
-	    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-		if ($row['PlayState'] < 0)
-		    $row['PlayState'] = "Played";
-		else if ($row['PlayState'] > 0)
-		    $row['PlayState'] = "Pending";
-		else
-		    $row['PlayState'] = "Playing";
-		$Queue[$QueueCount] = AbsoluteURL($row);
-		$QueueCount++;
-	    }
-
-	    $QueueStmt->close();
-	}
-
-	print_r($Queue);
-	return $Queue;
-	//return json_encode($Queue);
     }
 
 }
