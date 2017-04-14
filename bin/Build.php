@@ -76,7 +76,7 @@ function PrepareFolderImage($ImageFileName, $SpriteNo)
     copy(dirname($img) . "/160x160.jpg", $newfile);
 }
 
-function Make_CSS(&$Sprites, $CSS1, $CSS2)
+function Make_CSS(&$Sprites, $SpritesDir, $CSS1, $CSS2)
 {
     global $NL;
     global $AppDir;
@@ -92,9 +92,9 @@ function Make_CSS(&$Sprites, $CSS1, $CSS2)
     // On an ipad somehow the size of a sprite image should be < 1024 pixels 
     // wide / high - otherwise the display of sprite elements are distorted.
 
-    $cmd1 = "montage -background transparent -tile " . $TileW . "x" . $TileH . " -geometry 80x80+1+1 " . $AppDir . "folder/80x80_* " . $AppDir . "sprites/sprite.jpg";
+    $cmd1 = "montage -background transparent -tile " . $TileW . "x" . $TileH . " -geometry 80x80+1+1 " . $AppDir . "folder/80x80_* " . $AppDir . "$SpritesDir/sprite.jpg";
     echo $cmd1 . $NL;
-    $cmd2 = "montage -background transparent -tile " . $TileW . "x" . $TileH . " -geometry 160x160+1+1 " . $AppDir . "folder/160x160_* " . $AppDir . "sprites/sprite@2x.jpg";
+    $cmd2 = "montage -background transparent -tile " . $TileW . "x" . $TileH . " -geometry 160x160+1+1 " . $AppDir . "folder/160x160_* " . $AppDir . "$SpritesDir/sprite@2x.jpg";
 
     shell_exec($cmd1);
     echo $cmd2 . $NL;
@@ -151,9 +151,59 @@ function Make_CSS(&$Sprites, $CSS1, $CSS2)
 }
 
 
+function MakeIndexHtml($SpritesDir, $IndexHtml)
+{
+    $index = <<< EOF
+<!DOCTYPE html>
+<!--
+/*!
+* LinnDS-jukebox
+*
+* Copyright (c) 2011-2017 Henrik Tolbøl, http://tolbøl.dk
+*
+* Licensed under the MIT license:
+* http://www.opensource.org/licenses/mit-license.php
+*/
+-->
+<html>
+    <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+
+	<title>LinnDS-jukebox</title> 
+
+	<link rel="stylesheet" href="../resources/jquery.mobile-1.4.5.min.css" />
+	<link rel="stylesheet" href="$SpritesDir/sprites.css" />
+	<link rel="stylesheet" href="$SpritesDir/sprites@2x.css" media="(-webkit-min-device-pixel-ratio: 2)"/>
+	<script src="../resources/jquery-1.11.2.min.js"></script>
+	<link rel="stylesheet" href="musik.css" />
+	<script src="actions.js"></script>
+	<script>
+	    \$(document).bind("mobileinit", function(){
+		    //\$.extend($.mobile, {
+		    //defaultPageTransition: 'none',
+		    //defaultDialogTransition: 'none'
+		//});
+	    });
+	    //getStatus();
+
+	</script>
+	<script src="../resources/jquery.mobile-1.4.5.min.js"></script>
+
+    </head>
+    <body>
+
+    </body>
+</html>
+EOF;
+
+    file_put_contents($IndexHtml, $index);
+}
+
+
 // ########## Main  #######################################################################
 
-function Main($DoLevel)
+function Build($UnlinkDPL, $MakePlaylists, $AddNewAlbums, $CreateSprites)
 {
     global $NL;
     global $RootMenu;
@@ -164,32 +214,29 @@ function Main($DoLevel)
 
     $AppDir = "site/";
 
+    date_default_timezone_set("Europe/Copenhagen");
+
     $DATABASE_FILENAME = dirname(__DIR__) . "/LinnDS-jukebox.db";
 
-    if (!file_exists($AppDir . "folder"))
-	mkdir($AppDir . "folder");
-    if (!file_exists($AppDir . "sprites"))
-	mkdir($AppDir . "sprites");
-
-    $NumNewPlaylists = 0;
-
     //Create a didl file in each directory containing music
-    if ($DoLevel > 3) 
+    if ($UnlinkDPL > 0) 
     {
 	echo "Removing old .dpl files" . $NL;
 	UnlinkDPL($TopDirectory);
     }
     
-    echo "Making a didl file in each directory..." . $NL;
-    $DirPlaylist = new Playlist();
-    if (1)
+    if ($MakePlaylists > 0)
+    {
+	echo "Making a didl file in each directory..." . $NL;
+	$DirPlaylist = new Playlist();
 	$NumNewPlaylists = $DirPlaylist->MakePlaylists($TopDirectory);
-    echo " - found $NumNewPlaylists new playlists" . $NL;
+	echo " - found $NumNewPlaylists new playlists" . $NL;
+    }
 
     //unlink($DATABASE_FILENAME);
     $musicDB = MusicDB::create($DATABASE_FILENAME);
 
-    if (1)
+    if ($AddNewAlbums > 0)
     {
 	echo "Find all didl files and add to Menu tree..." . $NL;
 	// Find all didl files and add it to the menus
@@ -228,28 +275,35 @@ function Main($DoLevel)
 	}
     }
 
-    $musicDB->CreateNewSpritesTable();
-    $Sprites = $musicDB->QuerySprites();
-
-    //print_r($Sprites[7]);
-
-    if (1)
+    if ($CreateSprites > 0)
     {
+	$SpritesDir = "sprites" . date("YmdHis");
+
+	if (!file_exists($AppDir . "folder"))
+	    mkdir($AppDir . "folder");
+	if (!file_exists($AppDir . "$SpritesDir"))
+	    mkdir($AppDir . "$SpritesDir");
+
+	$musicDB->CreateNewSpritesTable();
+	$Sprites = $musicDB->QuerySprites();
+
+	//print_r($Sprites[7]);
+
 	echo "Collect all thumb images in folder and make fortrunning file name $NL";
 	foreach ($Sprites as $item)
 	{
 	    PrepareFolderImage($item['ImageURI'], $item['rowid']);
 	}
 
-	copy("www/index.html", $AppDir . "index.html");
 	copy("www/actions.js", $AppDir . "actions.js");
 	copy("www/musik.css", $AppDir . "musik.css");
 	copy("images/Transparent.gif", $AppDir . "Transparent.gif");
 
-	echo $NL . "Making sprites and css file in " . $AppDir . $NL;
-	array_map('unlink', glob("$AppDir/sprites/*.jpg"));
-	Make_CSS($Sprites, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
+	echo $NL . "Making $SpritesDir and css file in " . $AppDir . $NL;
+	array_map('unlink', glob("$AppDir/$SpritesDir/*.jpg"));
+	Make_CSS($Sprites, $SpritesDir, $AppDir . "$SpritesDir/sprites.css", $AppDir . "$SpritesDir/sprites@2x.css");
 	array_map('unlink', glob("$AppDir/folder/*.jpg"));
+	MakeIndexHtml($SpritesDir, $AppDir . "index.html");
     }
 
     $musicDB->close();
@@ -257,7 +311,7 @@ function Main($DoLevel)
     echo "Finished..." . $NL;
 }
 
-//Main(1);
-Main(1);
+//Build(1);
+Build(0, 1, 1, 1);
 
 ?>
