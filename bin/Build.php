@@ -214,8 +214,6 @@ function Build($UnlinkDPL, $MakePlaylists, $AddNewAlbums, $CreateSprites)
 
     $AppDir = "site/";
 
-    date_default_timezone_set("Europe/Copenhagen");
-
     $DATABASE_FILENAME = dirname(__DIR__) . "/LinnDS-jukebox.db";
 
     //Create a didl file in each directory containing music

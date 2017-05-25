@@ -13,6 +13,8 @@ $SQ = "'";
 $DQ = '"';
 $DIR_DELIM = "/";
 
+date_default_timezone_set("Europe/Copenhagen");
+
 echo "setup.php: __DIR__=" . dirname(__DIR__) . "\n";
 
 $DATABASE_FILENAME = "/Users/henrik/Documents/Projekter/composer/LinnDS-jukebox.db";
