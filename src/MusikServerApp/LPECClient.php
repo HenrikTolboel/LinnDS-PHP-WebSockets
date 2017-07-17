@@ -265,7 +265,7 @@ class LPECClient
     // return 2 if data was handled and state was changed
     public function processMessage($message)
     {
-	$DEBUG = 3;
+	$DEBUG = 0;
 	LogWrite("LPECClientSocket::processMessage - $message");
     
 	$DataHandled = 0;
@@ -306,7 +306,7 @@ class LPECClient
 	    // send the possible next command (Send) after removing
 	    // previous command.
 	    $front = array_shift($this->Queue);
-	    if ($DEBUG > 0)
+	    if ($DEBUG > 1)
 		LogWrite("Command: " . $front . " -> " . $message);
 
 	    if (strpos($front, "ACTION Ds/Product 1 Source ") !== false) 
