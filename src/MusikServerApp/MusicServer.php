@@ -230,10 +230,14 @@ class MusicServer implements MessageComponentInterface {
 			$Continue = false;
 		}
 
-		for ($i = 0; $i < 50; $i++) 
+		$Random = $musicDB->QueryRandomTracks(0, 50);
+		$RandomCount = count($Random);
+		for ($i = 0; $i < $RandomCount; $i++) 
 		{
-		    $RandomPreset = rand($JukeBoxFirstAlbum, $JukeBoxLastAlbum);
-		    $RandomTrack = rand(1, $musicDB->NumberOfTracks($RandomPreset));
+		    //$RandomPreset = rand($JukeBoxFirstAlbum, $JukeBoxLastAlbum);
+		    //$RandomTrack = rand(1, $musicDB->NumberOfTracks($RandomPreset));
+		    $RandomPreset = $Random[$i]['Preset'];
+		    $RandomTrack = $Random[$i]['RandomTrack'];
 		    if ($i == 0)
 		    {
 			if ($this->LPEC->InsertDIDL_list($musicDB, $RandomPreset, $RandomTrack, end($this->getState()->getState('IdArray'))) == false)
@@ -300,6 +304,7 @@ class MusicServer implements MessageComponentInterface {
 		    LogWrite("VolumeIncr5: ");
 		    $value = $this->getState()->getState('Volume');
 		    $value = $value + 5;
+		    /*
 		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
 			$Continue = false;
 		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
@@ -309,6 +314,9 @@ class MusicServer implements MessageComponentInterface {
 		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
 			$Continue = false;
 		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
+			$Continue = false;
+		     */
+		    if ($this->LPEC->Send("ACTION Ds/Volume 1 SetVolume \"" . $value . "\"") == false)
 			$Continue = false;
 		    $this->getState()->setState('Volume', $value);
 		}
@@ -342,6 +350,7 @@ class MusicServer implements MessageComponentInterface {
 		LogWrite("VolumeDecr: ");
 		$value = $this->getState()->getState('Volume');
 		$value = $value - 5;
+		/*
 		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
 		    $Continue = false;
 		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
@@ -351,6 +360,9 @@ class MusicServer implements MessageComponentInterface {
 		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
 		    $Continue = false;
 		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
+		    $Continue = false;
+		 */
+		if ($this->LPEC->Send("ACTION Ds/Volume 1 SetVolume \"" . $value . "\"") == false)
 		    $Continue = false;
 		$this->getState()->setState('Volume', $value);
 		$DataHandled = true;

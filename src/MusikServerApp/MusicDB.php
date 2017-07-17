@@ -411,6 +411,33 @@ class MusicDB extends \SQLite3
 	//return json_encode($R);
     }
 
+    public function QueryRandomTracks($RootMenuNo, $Limit)
+    {
+	$SelStmt = "SELECT Preset, NoTracks FROM Album where RootMenuNo == $RootMenuNo order by Random() Limit $Limit";
+
+	$Stmt = $this->prepare($SelStmt);
+
+	$result = $Stmt->execute();
+
+	$R = array();
+	$i = 0;
+	// fetchArray(SQLITE3_NUM | SQLITE_ASSOC | SQLITE_BOTH) - default both
+	while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+	    $R[$i] = $row;
+	    $i++;
+	}
+
+	for ($i = 0; $i < count($R); $i++) {
+	    $R[$i]['RandomTrack'] = rand(1, $R[$i]['NoTracks']);
+	}
+
+	$Stmt->close();
+
+	//print_r($R);
+	return $R;
+	//return json_encode($R);
+    }
+
     public function QueryAlphabetPresent($menu)
     {
 	global $ALPHABET_SIZE;
@@ -493,7 +520,7 @@ class MusicDB extends \SQLite3
 	    $first = false;
 	}
 
-	//echo "QuearySearch_BuildSelect: $SelectStmt\n";
+	//echo "QuerySearch_BuildSelect: $SelectStmt\n";
 
 	return $SelectStmt;
     }
@@ -565,6 +592,21 @@ function test()
 
     $musicDB->close();
 }
+
+function testQueryRandomTracks()
+{
+    global $NL;
+
+    $musicDB = MusicDB::create("LinnDS-jukebox.db");
+
+    $A = $musicDB->QueryRandomTracks(0, 10);
+
+    print_r($A);
+
+
+}
+
 //test();
 //test();
+//testQueryRandomTracks();
 ?>
