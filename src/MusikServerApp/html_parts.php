@@ -303,6 +303,7 @@ function KontrolPanel_panel($musicDB, $id)
 	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-TV"}'>TV</button>
 	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Radio"}'>Radio</button>
 	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-NetAux"}'>AirPlay</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Spotify"}'>Spotify</button>
 	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Off"}'>Off</button>
     </div><!-- /panel -->
 EOT;

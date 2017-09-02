@@ -709,7 +709,7 @@ $(function() {
 	html += values.TrackNumber + '. ';
 	html += values.Title + Performer;
 	html += '</h3>';
-	html += '<p>' + values.Duration + '</p>';  
+	html += '<p>' + values.Duration + ' [' + values.SampleFrequency + "Hz/" + values.BitsPerSample + 'bit]</p>';
 	html += '</a>';
 
 	html += '</li>';
@@ -725,7 +725,7 @@ $(function() {
 	//html += '<img class="sprite_' + values.Preset + '" src="Transparent.gif"/>';
 	html += '<img class="preset_' + values.Preset + '" src="Transparent.gif"/>';
 	html += '<h3>' + values.ArtistPerformer + ' - ' + values.Album + '</h3>';
-	html += '<p>' + values.TrackNumber + '. ' + values.Title + ' (' + values.Duration + ') ' + '</p> ';
+	html += '<p>' + values.TrackNumber + '. ' + values.Title + ' (' + values.Duration + ') [' + values.SampleFrequency + "Hz/" + values.BitsPerSample + 'bit]</p> ';
         html += '</a>';
 	html += '<a href="#" class="showalbumclick" data-musik=' + "'" + '{"preset": "' + values.Preset + '"}' + "'" + '></a>';
         html += '</li>';
@@ -740,7 +740,7 @@ $(function() {
 	//html += '<img class="sprite_' + values.preset + '" src="Transparent.gif"/>';
 	html += '<img class="preset_' + values.preset + '" src="Transparent.gif"/>';
 	html += '<h3>' + values.artist.Performer + ' - ' + values.album + '</h3>';
-	html += '<p>' + values.originalTrackNumber + '. ' + values.title + ' (' + values.duration + ') ' + '</p> ';
+	html += '<p>' + values.originalTrackNumber + '. ' + values.title + ' (' + values.duration + ') [' + values.sampleFrequency + "Hz/" + values.bitsPerSample + 'bit]</p> ';
         html += '</a>';
 	html += '<a href="#" class="showalbumclick" data-musik=' + "'" + '{"preset": "' + values.preset + '"}' + "'" + '></a>';
         html += '</li>';

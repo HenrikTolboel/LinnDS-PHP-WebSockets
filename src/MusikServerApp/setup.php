@@ -46,31 +46,34 @@ if (gethostname() == "DiskStation")
 // Each directory maps into one of the RootMenu entries.
 $TopDirectory = array();
 $TopDirectory["$BUILD_PATH/EAC"]                = 0;
-$TopDirectory["$BUILD_PATH/Linn"]               = 1;
-$TopDirectory["$BUILD_PATH/Opsamlinger"]        = 2;
-$TopDirectory["$BUILD_PATH/EAC Classical"]      = 3;
-$TopDirectory["$BUILD_PATH/Børn"]               = 4;
-$TopDirectory["$BUILD_PATH/Børn - opsamlinger"] = 5;
-$TopDirectory["$BUILD_PATH/Diverse"]            = 6;
+$TopDirectory["$BUILD_PATH/Linn/EAC"]           = 0;
+$TopDirectory["$BUILD_PATH/Linn/Classical"]     = 2;
+$TopDirectory["$BUILD_PATH/Linn/Various"]       = 1;
+$TopDirectory["$BUILD_PATH/Opsamlinger"]        = 1;
+$TopDirectory["$BUILD_PATH/EAC Classical"]      = 2;
+$TopDirectory["$BUILD_PATH/Børn"]               = 3;
+$TopDirectory["$BUILD_PATH/Børn - opsamlinger"] = 4;
+$TopDirectory["$BUILD_PATH/Diverse"]            = 5;
+$TopDirectory["$BUILD_PATH/TheArchives"]        = 6;
 if ($IsJul == 1)
 {
     $TopDirectory["$BUILD_PATH/Jul"]                = 8;
 }
 else
 {
-    $TopDirectory["$BUILD_PATH/Jul"]                = 6;
+    $TopDirectory["$BUILD_PATH/Jul"]                = 5;
 }
 
 
 // These are the RootMenu entries. The names are those displayed there
 $RootMenu = array();
 $RootMenu[0] = "Kunstner / Album";
-$RootMenu[1] = "Linn / Album";
-$RootMenu[2] = "Opsamlinger";
-$RootMenu[3] = "Klassisk / Album";
-$RootMenu[4] = "Børn - Kunstner / Album";
-$RootMenu[5] = "Børn - Opsamlinger";
-$RootMenu[6] = "Diverse";
+$RootMenu[1] = "Opsamlinger";
+$RootMenu[2] = "Klassisk / Album";
+$RootMenu[3] = "Børn - Kunstner / Album";
+$RootMenu[4] = "Børn - Opsamlinger";
+$RootMenu[5] = "Diverse";
+$RootMenu[6] = "The Archives";
 $RootMenu[7] = "Newest";
 if ($IsJul == 1)
 {
@@ -87,12 +90,12 @@ define("SUBMENU_TYPE_NEWEST", 2);
 // This is the type of submenu for each of the RootMenu entries.
 $SubMenuType = array();
 $SubMenuType[0] = SUBMENU_TYPE_ALPHABET;
-$SubMenuType[1] = SUBMENU_TYPE_ALPHABET;
-$SubMenuType[2] = SUBMENU_TYPE_NONE;
+$SubMenuType[1] = SUBMENU_TYPE_NONE;
+$SubMenuType[2] = SUBMENU_TYPE_ALPHABET;
 $SubMenuType[3] = SUBMENU_TYPE_ALPHABET;
-$SubMenuType[4] = SUBMENU_TYPE_ALPHABET;
+$SubMenuType[4] = SUBMENU_TYPE_NONE;
 $SubMenuType[5] = SUBMENU_TYPE_NONE;
-$SubMenuType[6] = SUBMENU_TYPE_NONE;
+$SubMenuType[6] = SUBMENU_TYPE_ALPHABET;
 $SubMenuType[7] = SUBMENU_TYPE_NEWEST;
 if ($IsJul == 1)
 {

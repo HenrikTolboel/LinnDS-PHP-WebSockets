@@ -510,7 +510,7 @@ class MusicServer implements MessageComponentInterface {
 		    //Source Radio
 		    if ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'Radio'))
 		    {
-			if ($this->LPEC->Send('ACTION Ds/Product 1 SetSourceIndex "' . $this-getState()->getStateArray('SourceName', 'Radio') . '"') == false)
+			if ($this->LPEC->Send('ACTION Ds/Product 1 SetSourceIndex "' . $this->getState()->getStateArray('SourceName', 'Radio') . '"') == false)
 			    $Continue = false;
 		    }
 		    $DataHandled = true;
@@ -521,6 +521,16 @@ class MusicServer implements MessageComponentInterface {
 		    if ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'Net Aux'))
 		    {
 			if ($this->LPEC->Send('ACTION Ds/Product 1 SetSourceIndex "' . $this->getState()->getStateArray('SourceName', 'Net Aux') . '"') == false)
+			    $Continue = false;
+		    }
+		    $DataHandled = true;
+		}
+		elseif (strpos($message, "Source-Spotify") !== false) 
+		{
+		    //Source Spotify
+		    if ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'Spotify'))
+		    {
+			if ($this->LPEC->Send('ACTION Ds/Product 1 SetSourceIndex "' . $this->getState()->getStateArray('SourceName', 'Spotify') . '"') == false)
 			    $Continue = false;
 		    }
 		    $DataHandled = true;

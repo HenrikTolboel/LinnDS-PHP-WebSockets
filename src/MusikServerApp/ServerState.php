@@ -70,7 +70,8 @@ class ServerState
     public function setStateArray($name, $subName, $value)
     {
 	$this->State[$name][$subName] = $value;
-	LogWrite("ServerState:setStateArray[$name][$subName]=$value");
+	if ($name !== "PlaylistXMLs")
+	    LogWrite("ServerState:setStateArray[$name][$subName]=$value");
     }
 
     public function getStateArray($name, $subName)
