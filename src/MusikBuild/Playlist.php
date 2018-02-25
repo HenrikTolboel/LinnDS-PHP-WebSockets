@@ -100,7 +100,7 @@ class Playlist
 	$cnt = $Arr->count();
 
 	if ($cnt > 1)
-	    $Arr->uasort(array('Playlist', 'TrackNoOrder'));
+	    $Arr->uasort(array($this, 'TrackNoOrder'));
 
 	$it = $Arr->getIterator();
 	while($it->valid()) 
