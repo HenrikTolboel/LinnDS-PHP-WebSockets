@@ -488,6 +488,10 @@ class MusicServer implements MessageComponentInterface {
 		    //Source Playlist
 		    if ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'Playlist'))
 		    {
+			if ($this->LPEC->Send('ACTION Ds/Playlist 1 SetShuffle "0"') == false)
+			    $Continue = false;
+			if ($this->LPEC->Send('ACTION Ds/Playlist 1 SetRepeat "0"') == false)
+			    $Continue = false;
 			if ($this->LPEC->Send('ACTION Ds/Product 1 SetSourceIndex "' . $this->getState()->getStateArray('SourceName', 'Playlist') . '"') == false)
 			    $Continue = false;
 		    }
