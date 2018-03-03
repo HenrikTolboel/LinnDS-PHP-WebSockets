@@ -222,11 +222,19 @@ class LPECClient
 	    if ($this->Send('ACTION Ds/Product 1 SetStandby "false"') === false)
 		$Res = false;
 	    $this->getState()->setState('Standby', false);
+	    if ($this->Send('ACTION Ds/Playlist 1 SetShuffle "0"') === false)
+		$Res = false;
+	    if ($this->Send('ACTION Ds/Playlist 1 SetRepeat "0"') === false)
+		$Res = false;
 	    if ($this->Send('ACTION Ds/Product 1 SetSourceIndex "' . $this->getState()->getStateArray('SourceName', 'Playlist') . '"') === false)
 		$Res = false;
 	}
 	elseif ($this->getState()->getState('SourceIndex') != $this->getState()->getStateArray('SourceName', 'Playlist'))
 	{
+	    if ($this->Send('ACTION Ds/Playlist 1 SetShuffle "0"') === false)
+		$Res = false;
+	    if ($this->Send('ACTION Ds/Playlist 1 SetRepeat "0"') === false)
+		$Res = false;
 	    if ($this->Send('ACTION Ds/Product 1 SetSourceIndex "' . $this->getState()->getStateArray('SourceName', 'Playlist') . '"') === false)
 		$Res = false;
 	}
