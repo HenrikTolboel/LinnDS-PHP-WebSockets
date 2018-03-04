@@ -304,18 +304,6 @@ class MusicServer implements MessageComponentInterface {
 		    LogWrite("VolumeIncr5: ");
 		    $value = $this->getState()->getState('Volume');
 		    $value = $value + 5;
-		    /*
-		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
-			$Continue = false;
-		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
-			$Continue = false;
-		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
-			$Continue = false;
-		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
-			$Continue = false;
-		    if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeInc") == false)
-			$Continue = false;
-		     */
 		    if ($this->LPEC->Send("ACTION Ds/Volume 1 SetVolume \"" . $value . "\"") == false)
 			$Continue = false;
 		    $this->getState()->setState('Volume', $value);
@@ -350,18 +338,6 @@ class MusicServer implements MessageComponentInterface {
 		LogWrite("VolumeDecr: ");
 		$value = $this->getState()->getState('Volume');
 		$value = $value - 5;
-		/*
-		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
-		    $Continue = false;
-		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
-		    $Continue = false;
-		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
-		    $Continue = false;
-		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
-		    $Continue = false;
-		if ($this->LPEC->Send("ACTION Ds/Volume 1 VolumeDec") == false)
-		    $Continue = false;
-		 */
 		if ($this->LPEC->Send("ACTION Ds/Volume 1 SetVolume \"" . $value . "\"") == false)
 		    $Continue = false;
 		$this->getState()->setState('Volume', $value);
@@ -490,15 +466,6 @@ class MusicServer implements MessageComponentInterface {
 		    {
 			if ($this->LPEC->SelectPlaylist() == false)
 			    $Continue = false;
-
-			/*
-			if ($this->LPEC->Send('ACTION Ds/Playlist 1 SetShuffle "0"') == false)
-			    $Continue = false;
-			if ($this->LPEC->Send('ACTION Ds/Playlist 1 SetRepeat "0"') == false)
-			    $Continue = false;
-			if ($this->LPEC->Send('ACTION Ds/Product 1 SetSourceIndex "' . $this->getState()->getStateArray('SourceName', 'Playlist') . '"') == false)
-			    $Continue = false;
-			 */
 		    }
 		    if ($this->LPEC->Play() == false)
 			$Continue = false;
