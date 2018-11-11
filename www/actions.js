@@ -252,8 +252,8 @@ $(function() {
 
 	    var decoded = $("<div/>").html(PlaylistXMLs[i]).text();
 	    var xmlDoc = $.parseXML(decoded);
-	    $xml = $(xmlDoc);
-	    $xml.children().each(function() {
+	    //$xml = $(xmlDoc);
+	    $(xmlDoc).children().each(function() {
 		var tagName=this.tagName;
 		var val=$(this).text();
 		$.each(this.attributes, function (i, attrib) {

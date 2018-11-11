@@ -112,7 +112,7 @@ function SubMenuType2Str($SubMenuType)
     elseif ($SubMenuType == SUBMENU_TYPE_NEWEST)
 	$TypeStr = "newest";
     else
-	$TypeStr == "unknown";
+	$TypeStr = "unknown";
     return $TypeStr;
 }
 
